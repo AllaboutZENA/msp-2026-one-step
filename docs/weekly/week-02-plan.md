@@ -8,7 +8,7 @@
 - [ ] 수업 README_sample 원본과 README 대조.
 - [x] 원격 저장소와 master·develop 생성.
 - [ ] 팀원·교수자 초대 상태 및 접근 확인.
-- [ ] Projects 보드와 Wiki 생성.
+- [x] Projects 보드와 Wiki 생성.
 - [ ] 각 팀원의 실제 수정 PR·병합.
 - [ ] 팀 구성 폼 및 개인 LMS 제출 확인.
 
@@ -18,4 +18,6 @@
 
 개인별 PR 실습: [각 학생이 직접 수행·확인 후 링크 입력]
 
-미확정: 실제 팀 정보, 수업 README_sample 원본, 팀원·교수자 접근 확인, 개인 실습과 제출 증빙. Projects·Wiki는 생성·확인 후 링크와 상태를 갱신합니다.
+미확정: 실제 팀 정보, 수업 README_sample 원본, 팀원·교수자 접근 확인, 개인 실습과 제출 증빙. Projects: https://github.com/users/AllaboutZENA/projects/3
+
+Wiki: https://github.com/AllaboutZENA/msp-2026-one-step/wiki
