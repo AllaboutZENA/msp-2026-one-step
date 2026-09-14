@@ -1,0 +1,39 @@
+# macOS / editor local files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Node / Expo generated files
+node_modules/
+.expo/
+dist/
+web-build/
+coverage/
+*.log
+*.tsbuildinfo
+
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.p8
+*.key
+*.jks
+*.keystore
+credentials.json
+
+# Local database and application packages
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.apk
+*.aab
+*.ipa
+
+# Dependencies are reproducible; commit package-lock.json when generated.
