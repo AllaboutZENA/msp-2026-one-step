@@ -1,0 +1,28 @@
+name: 작업
+description: 구현·설계·문서 작업과 완료 기준
+title: "[작업] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 해결할 문제와 작업 범위
+      description: 왜 필요한지와 이번 작업에 포함할 내용을 적습니다.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 완료 기준
+      placeholder: "- [ ] 사용자가 수행할 수 있어야 하는 행동"
+    validations:
+      required: true
+  - type: input
+    id: schedule
+    attributes:
+      label: 담당자와 예정 주차
+      placeholder: "GitHub ID / 5주차"
+  - type: textarea
+    id: validation
+    attributes:
+      label: 확인 방법과 실제 결과
+      description: 계획과 수행 결과를 구분합니다. 수행 후 기기·절차·결과·PR 링크를 갱신합니다.
