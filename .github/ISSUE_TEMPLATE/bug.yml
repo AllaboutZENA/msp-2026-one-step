@@ -1,0 +1,28 @@
+name: 오류
+description: 실제로 발견한 오류를 재현 가능하게 기록
+title: "[오류] "
+body:
+  - type: input
+    id: environment
+    attributes:
+      label: 기기·OS·앱 버전 또는 커밋
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 단계
+      placeholder: "1. 어떤 화면에서\n2. 어떤 값을 입력하고\n3. 어떤 버튼을 누르면"
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 예상 결과와 실제 결과
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 증빙과 수정 확인
+      description: 개인정보 없는 화면·로그와 수정 후 확인 결과를 적습니다.
