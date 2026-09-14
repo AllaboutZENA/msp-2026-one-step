@@ -64,8 +64,14 @@ React Native · Expo · TypeScript · SQLite · GitHub Issues / Projects / Wiki
 ## 프로젝트 링크
 
 - Repository: [msp-2026-one-step](https://github.com/AllaboutZENA/msp-2026-one-step)
-- Projects: [생성 후 실제 URL 입력]
-- Wiki: [생성 후 실제 URL 입력]
+- Projects: [마감한칸 개발 보드](https://github.com/users/AllaboutZENA/projects/3)
+- Wiki: [설계 문서](https://github.com/AllaboutZENA/msp-2026-one-step/wiki)
 - Demo / Release: [실제 준비 후 입력]
 
 개인 기여와 AI 보조 사용은 실제 작업·수정·검증 내역에 맞춰 [기여 기록 틀](docs/contributions/TEMPLATE.md)에 기록합니다.
+
+## 초기 설정 현황
+
+2026-09-14: AllaboutZENA 계정에서 Codex의 도움으로 저장소, master·develop, 문서·템플릿, Wiki 4개 페이지, Issue 5개, Projects 보드와 주차·우선순위 필드를 준비했습니다. 초기 설정 PR은 [#1](https://github.com/AllaboutZENA/msp-2026-one-step/pull/1)입니다.
+
+아직 필요한 항목은 [제출 준비 Issue #6](https://github.com/AllaboutZENA/msp-2026-one-step/issues/6)에서 관리합니다. 팀 정보 확인, 수업 원본 양식 대조, 팀원·교수자 접근, 학생 개인별 PR 실습, 폼·LMS 제출은 완료 확인 전입니다.
