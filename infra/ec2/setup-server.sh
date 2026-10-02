@@ -61,13 +61,13 @@ SQL
   sudo -u postgres psql -Atc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1 \
     || sudo -u postgres createdb -O "$DB_USER" "$DB_NAME"
   sudo -u postgres psql -q -d "$DB_NAME" -c "REVOKE ALL ON DATABASE $DB_NAME FROM PUBLIC; GRANT CONNECT ON DATABASE $DB_NAME TO $DB_USER;"
-  umask 027
-  sudo tee "$ENV_FILE" >/dev/null <<ENV
+  (umask 027; sudo tee "$ENV_FILE" >/dev/null <<ENV
 HOST=127.0.0.1
 PORT=3000
 NODE_ENV=production
 DATABASE_URL=postgresql://$DB_USER:$DB_PASSWORD@127.0.0.1:5432/$DB_NAME
 ENV
+  )
   sudo chown root:"$APP_USER" "$ENV_FILE" && sudo chmod 640 "$ENV_FILE"
   unset DB_PASSWORD
 fi

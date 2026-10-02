@@ -35,8 +35,8 @@
 | --- | --- | --- |
 | 모바일 | React Native · Expo SDK 57 · TypeScript | `apps/mobile`, 개발은 맥북 iOS 시뮬레이터 + Expo Go |
 | API | Node.js 24 LTS · Express 5 · TypeScript | `apps/api`, 내부 `127.0.0.1:3000` |
-| DB | PostgreSQL | 서버는 EC2의 PostgreSQL, 로컬 개발은 Homebrew PostgreSQL 18 |
-| 서버 | AWS EC2 t3.micro 1대 · Nginx HTTPS · systemd | [Server-Plan](docs/wiki/Server-Plan.md) ([PR #8](https://github.com/AllaboutZENA/msp-2026-one-step/pull/8) 병합) |
+| DB | PostgreSQL 18 | 서버는 EC2의 PostgreSQL, 로컬 개발은 Homebrew PostgreSQL 18 |
+| 서버 | AWS EC2 t3.micro 1대 (시드니) · systemd · Nginx HTTPS 예정 | [Server-Plan](docs/wiki/Server-Plan.md) · [구성 기록](docs/infra/ec2-dev-server.md) |
 | 협업 | GitHub Issues / Projects / Wiki | |
 
 초기안의 기기 내부 SQLite 저장은 EC2 API + PostgreSQL 구성으로 바뀌었습니다. 모바일 → HTTPS Nginx → 내부 Node API → 같은 EC2의 PostgreSQL 순서로 연결하며 API·DB 포트는 인터넷에 공개하지 않습니다.
@@ -69,6 +69,8 @@ npm --prefix apps/mobile run ios       # iOS 시뮬레이터에서 Expo Go로 �
 npm --prefix apps/api run typecheck && npm --prefix apps/api test
 npm --prefix apps/mobile run typecheck
 ```
+
+EC2 개발 서버 사용법(SSH 터널, 배포 명령)은 [docs/infra/ec2-dev-server.md](docs/infra/ec2-dev-server.md)에 있습니다.
 
 iOS 시뮬레이터는 맥의 네트워크를 공유하므로 `http://localhost:3000`으로 로컬 API에 접근합니다. 실제 휴대폰에서 `localhost`는 휴대폰 자신이므로 맥의 LAN IP나 EC2 HTTPS 주소를 사용합니다. `EXPO_PUBLIC_*` 값은 앱에 포함되므로 비밀번호·키를 넣지 않습니다.
 
