@@ -1,9 +1,10 @@
 # 마감한칸 Wiki
 
-대학생이 과제를 작은 할 일로 나누고 마감과 진행률을 확인하는 개인용 모바일 앱입니다. 현재는 기획·설계 단계이며 앱 구현과 사용자 검증은 진행 전입니다.
+대학생이 과제를 작은 할 일로 나누고 마감과 진행률을 확인하는 개인용 모바일 앱입니다. Expo 앱과 EC2의 Node API·PostgreSQL로 구성합니다. 현재는 개발 환경과 최소 실행 골격을 준비한 단계이며 핵심 기능 구현과 사용자 검증은 진행 전입니다.
 
 - [요구사항](https://github.com/AllaboutZENA/msp-2026-one-step/wiki/Requirements): 대상 사용자, 핵심 기능, 완료 기준
 - [구조 설계](https://github.com/AllaboutZENA/msp-2026-one-step/wiki/Architecture): 화면과 데이터 구조, 동작 규칙
+- [서버 구성안 (PR #8, 검토 중)](https://github.com/AllaboutZENA/msp-2026-one-step/blob/codex/ec2-server-plan/docs/wiki/Server-Plan.md): EC2 t3.micro 한 대의 API·DB 운영 계획
 - [테스트 계획](https://github.com/AllaboutZENA/msp-2026-one-step/wiki/Test%E2%80%90Plan): 구현 후 확인할 시나리오
 
 ## 문서 관리

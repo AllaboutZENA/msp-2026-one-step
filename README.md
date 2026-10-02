@@ -2,7 +2,7 @@
 
 대학생이 과제를 작은 할 일로 나누고 마감과 진행률을 확인하는 개인용 모바일 앱입니다.
 
-> 상태: 기획 초안. 앱 코드는 아직 구현하지 않았습니다. 수업의 README_sample.md 원본을 받으면 항목과 형식을 대조하여 수정합니다.
+> 상태: 개발 환경 세팅 단계. `apps/mobile`(Expo)과 `apps/api`(Express) 최소 실행 골격만 있으며 핵심 기능은 아직 구현하지 않았습니다. 수업의 README_sample.md 원본을 받으면 항목과 형식을 대조하여 수정합니다.
 
 ## Team Members
 
@@ -23,31 +23,65 @@
 
 ## Core Features — 계획
 
-1. 과목명을 포함한 과제 등록·수정·삭제와 기기 내부 저장.
+1. 과목명을 포함한 과제 등록·조회·수정·삭제와 서버(PostgreSQL) 저장.
 2. 과제별 세부 작업 체크와 진행률 계산. 과제 제출 완료는 별도 표시.
 3. 마감순 조회·지연 표시·완료 목록과 로컬 알림.
 
-알림은 실제 기기 실험 후 확정합니다. 로그인, 서버, 학교 LMS 연동, 공동편집, AI 자동 계획은 이번 범위에 포함하지 않습니다.
+알림은 휴대폰의 로컬 알림이며 서버 푸시와 구분합니다. 실제 기기 실험 후 확정합니다. 공용 서버 DB를 쓰므로 최소 사용자 인증과 소유자별 접근 검사를 포함합니다(인증 방식은 3–4주차 결정). 학교 LMS 연동, AI 자동 계획, 채팅, 결제, 공동편집, 다중 기기 실시간 동기화, 앱스토어 출시는 이번 범위에 포함하지 않습니다.
 
-## Tech Stack — 제안
+## Tech Stack
 
-React Native · Expo · TypeScript · SQLite · GitHub Issues / Projects / Wiki
+| 구분 | 기술 | 비고 |
+| --- | --- | --- |
+| 모바일 | React Native · Expo SDK 57 · TypeScript | `apps/mobile`, 개발은 맥북 iOS 시뮬레이터 + Expo Go |
+| API | Node.js 24 LTS · Express 5 · TypeScript | `apps/api`, 내부 `127.0.0.1:3000` |
+| DB | PostgreSQL | 서버는 EC2의 PostgreSQL, 로컬 개발은 Homebrew PostgreSQL 18 |
+| 서버 | AWS EC2 t3.micro 1대 · Nginx HTTPS · systemd | 계획안([PR #8](https://github.com/AllaboutZENA/msp-2026-one-step/pull/8)), 아직 생성하지 않음 |
+| 협업 | GitHub Issues / Projects / Wiki | |
 
-팀의 기존 기술 경험과 테스트 기기를 확인한 뒤 확정합니다. 설치된 의존성과 지원 플랫폼은 개발 착수 후 기록합니다.
+초기안의 기기 내부 SQLite 저장은 EC2 API + PostgreSQL 구성으로 바뀌었습니다. 모바일 → HTTPS Nginx → 내부 Node API → 같은 EC2의 PostgreSQL 순서로 연결하며 API·DB 포트는 인터넷에 공개하지 않습니다.
 
 ## Run
 
-현재는 기획·협업 준비 파일만 있으며 실행할 앱이 없습니다. 첫 실행이 확인된 뒤 이 항목에 Node.js·패키지 버전, 설치·실행 명령, 테스트 기기, 시연 데이터를 추가합니다. 환경 변수는 현재 사용하지 않습니다.
+개발 환경 상세와 검증 기록: [docs/setup/pc-setup-2026-10-02.md](docs/setup/pc-setup-2026-10-02.md)
+
+필요 도구: Node.js 24 LTS, npm, Xcode + iOS 시뮬레이터, PostgreSQL(로컬 개발용). 루트에서 `npm run install:all`, `npm run api`, `npm run ios`, `npm run check`로 줄여 실행할 수 있습니다.
+
+```bash
+# 1) 의존성 설치
+npm --prefix apps/api install
+npm --prefix apps/mobile install
+
+# 2) 환경 변수 (실제 값은 커밋하지 않음)
+cp apps/api/.env.example apps/api/.env              # DATABASE_URL 입력
+cp apps/mobile/.env.example apps/mobile/.env.local  # EXPO_PUBLIC_API_BASE_URL
+
+# 3) 로컬 DB 준비 (최초 1회)
+createdb magam_hankan_dev
+npm --prefix apps/api run db:migrate
+npm --prefix apps/api run db:seed      # 합성 테스트 데이터
+
+# 4) 실행 (터미널 2개)
+npm --prefix apps/api run dev          # http://127.0.0.1:3000/health
+npm --prefix apps/mobile run ios       # iOS 시뮬레이터에서 Expo Go로 열기
+
+# 5) 검사
+npm --prefix apps/api run typecheck && npm --prefix apps/api test
+npm --prefix apps/mobile run typecheck
+```
+
+iOS 시뮬레이터는 맥의 네트워크를 공유하므로 `http://localhost:3000`으로 로컬 API에 접근합니다. 실제 휴대폰에서 `localhost`는 휴대폰 자신이므로 맥의 LAN IP나 EC2 HTTPS 주소를 사용합니다. `EXPO_PUBLIC_*` 값은 앱에 포함되므로 비밀번호·키를 넣지 않습니다.
 
 ## Roadmap
 
 | 기간 | 목표 |
 | --- | --- |
 | 1~2주 | 팀·주제·저장소 구성 |
-| 3~4주 | 사용자 확인·화면·데이터 설계·기기 실험 |
-| 5~8주 | 과제 등록·저장·수정·삭제와 중간 시연 |
+| 3~4주 | 사용자 확인·화면·데이터 설계·기기 실험·AWS 접속과 API/DB 연결 검증 |
+| 5~7주 | 과제 등록·조회·수정·삭제와 서버(API·DB) 연결 |
+| 8주 | 휴대폰 → API → DB 중간 시연 |
 | 9~10주 | 세부 작업·진행률·마감·알림 |
-| 11~13주 | 테스트·사용성 확인·개선 |
+| 11~13주 | 통합·인증/접근 권한·사용성·오류/복구 검증과 개선 |
 | 14~15주 | 안정본·문서·최종 발표 |
 
 ## GitHub 운영
