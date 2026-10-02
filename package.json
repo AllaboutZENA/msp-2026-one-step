@@ -1,0 +1,12 @@
+{
+  "name": "magam-hankan",
+  "private": true,
+  "description": "마감한칸 — apps/mobile (Expo) + apps/api (Express). Each app has its own package-lock.json.",
+  "scripts": {
+    "install:all": "npm --prefix apps/api install && npm --prefix apps/mobile install",
+    "api": "npm --prefix apps/api run dev",
+    "mobile": "npm --prefix apps/mobile start",
+    "ios": "npm --prefix apps/mobile run ios",
+    "check": "npm --prefix apps/api run typecheck && npm --prefix apps/api test && npm --prefix apps/mobile run typecheck"
+  }
+}
