@@ -1,6 +1,6 @@
 # 구조 설계 — EC2 API · PostgreSQL 초안
 
-2026-10-02 갱신. 초기안의 "화면 → 기기 내부 SQLite" 구조를 EC2 한 대의 API·PostgreSQL 구조로 바꿨습니다. 서버 구성의 상세(보안 그룹, 비용 확인, 운영 절차)는 [PR #8의 Server-Plan](https://github.com/AllaboutZENA/msp-2026-one-step/blob/codex/ec2-server-plan/docs/wiki/Server-Plan.md)을 따릅니다. AWS 리소스는 아직 생성하지 않았습니다.
+2026-10-02 갱신. 초기안의 "화면 → 기기 내부 SQLite" 구조를 EC2 한 대의 API·PostgreSQL 구조로 바꿨습니다. 서버 구성의 상세(보안 그룹, 비용 확인, 운영 절차)는 [Server-Plan](Server-Plan.md)([PR #8](https://github.com/AllaboutZENA/msp-2026-one-step/pull/8)로 병합)을 따릅니다. AWS 리소스는 아직 생성하지 않았습니다.
 
 ```mermaid
 flowchart LR

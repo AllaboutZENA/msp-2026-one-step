@@ -36,7 +36,7 @@
 | 모바일 | React Native · Expo SDK 57 · TypeScript | `apps/mobile`, 개발은 맥북 iOS 시뮬레이터 + Expo Go |
 | API | Node.js 24 LTS · Express 5 · TypeScript | `apps/api`, 내부 `127.0.0.1:3000` |
 | DB | PostgreSQL | 서버는 EC2의 PostgreSQL, 로컬 개발은 Homebrew PostgreSQL 18 |
-| 서버 | AWS EC2 t3.micro 1대 · Nginx HTTPS · systemd | 계획안([PR #8](https://github.com/AllaboutZENA/msp-2026-one-step/pull/8)), 아직 생성하지 않음 |
+| 서버 | AWS EC2 t3.micro 1대 · Nginx HTTPS · systemd | [Server-Plan](docs/wiki/Server-Plan.md) ([PR #8](https://github.com/AllaboutZENA/msp-2026-one-step/pull/8) 병합) |
 | 협업 | GitHub Issues / Projects / Wiki | |
 
 초기안의 기기 내부 SQLite 저장은 EC2 API + PostgreSQL 구성으로 바뀌었습니다. 모바일 → HTTPS Nginx → 내부 Node API → 같은 EC2의 PostgreSQL 순서로 연결하며 API·DB 포트는 인터넷에 공개하지 않습니다.
