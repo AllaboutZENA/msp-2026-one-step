@@ -81,10 +81,10 @@ sudo -u "$APP_USER" git -C "$APP_DIR" checkout -q --detach "origin/$REF"
 sudo -u "$APP_USER" git -C "$APP_DIR" log -1 --format='deployed %h %s'
 
 log "API build and migrations"
-cd "$APP_DIR/apps/api"
-sudo -u "$APP_USER" HOME="/var/lib/$APP_USER" npm ci --no-audit --no-fund --loglevel=error
-sudo -u "$APP_USER" HOME="/var/lib/$APP_USER" npm run build --silent
-sudo -u "$APP_USER" HOME="/var/lib/$APP_USER" bash -c "set -a; . '$ENV_FILE'; set +a; npx tsx scripts/migrate.ts"
+as_app() { sudo -u "$APP_USER" HOME="/var/lib/$APP_USER" bash -c "cd '$APP_DIR/apps/api' && $1"; }
+as_app "npm ci --no-audit --no-fund --loglevel=error"
+as_app "npm run build --silent"
+as_app "set -a; . '$ENV_FILE'; set +a; npx tsx scripts/migrate.ts"
 
 log "systemd service"
 sudo install -m 644 "$APP_DIR/infra/ec2/magam-api.service" /etc/systemd/system/magam-api.service
