@@ -20,7 +20,7 @@
 | 앱 로그인·홈·등록·상세·설정 화면 (Expo Router) | 박초원 | [#13](https://github.com/AllaboutZENA/msp-2026-one-step/issues/13) | 이 PR | 완료(시뮬레이터) |
 | Maestro E2E 흐름 추가, 로컬·EC2에서 통과 | 박초원 | [#13](https://github.com/AllaboutZENA/msp-2026-one-step/issues/13) | 이 PR | 완료 |
 | EC2 배포(마이그레이션 002) · 스모크 | 박초원 | — | [#15](https://github.com/AllaboutZENA/msp-2026-one-step/pull/15) | 완료 |
-| HTTPS·고정 IP | 박초원 | [#14](https://github.com/AllaboutZENA/msp-2026-one-step/issues/14) | — | 진행 |
+| Elastic IP·Nginx HTTPS·로그인 요청 제한 | 박초원 | [#14](https://github.com/AllaboutZENA/msp-2026-one-step/issues/14) | HTTPS PR | 완료(실기기 확인 전) |
 
 ## 확인과 배운 점
 
@@ -44,9 +44,9 @@
 
 - 실제 휴대폰 실행과 로컬 알림 실험(#5) — 휴대폰 필요
 - 학생 3–5명 인터뷰(#3), 화면 스케치 팀 합의(#4)
-- HTTPS(#14), 수정·삭제 화면(W07), 세부 작업(W09)
+- 수정·삭제 화면(W07), 세부 작업(W09)
 
 ## 다음 주 계획
 
-- HTTPS 구성 후 실제 휴대폰으로 휴대폰 → API → DB 확인 (8주차 중간 시연 준비)
+- 실제 휴대폰으로 휴대폰 → HTTPS API → DB 확인 (8주차 중간 시연 준비)
 - W07: 과제 수정·삭제 화면, 과목 필터

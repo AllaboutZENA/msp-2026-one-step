@@ -2,7 +2,7 @@
 
 대학생이 과제를 작은 할 일로 나누고 마감과 진행률을 확인하는 개인용 모바일 앱입니다.
 
-> 상태: 핵심 기능 구현 중 (2026-10-15). 로그인, 과제 등록·조회·상세·제출 표시가 앱과 EC2 API·PostgreSQL에서 동작합니다. 수정·삭제 화면, 세부 작업, 알림, HTTPS는 진행 전입니다. 수업의 README_sample.md 원본을 받으면 항목과 형식을 대조하여 수정합니다.
+> 상태: 핵심 기능 구현 중 (2026-10-15). 로그인, 과제 등록·조회·상세·제출 표시가 앱과 EC2 API·PostgreSQL에서 동작합니다. 수정·삭제 화면, 세부 작업, 알림은 진행 전이며 서버는 HTTPS로 연결됩니다. 수업의 README_sample.md 원본을 받으면 항목과 형식을 대조하여 수정합니다.
 
 ## Team Members
 
@@ -36,7 +36,7 @@
 | 모바일 | React Native · Expo SDK 57 · TypeScript | `apps/mobile`, 개발은 맥북 iOS 시뮬레이터 + Expo Go |
 | API | Node.js 24 LTS · Express 5 · TypeScript | `apps/api`, 내부 `127.0.0.1:3000` |
 | DB | PostgreSQL 18 | 서버는 EC2의 PostgreSQL, 로컬 개발은 Homebrew PostgreSQL 18 |
-| 서버 | AWS EC2 t3.micro 1대 (시드니) · systemd · Nginx HTTPS 예정 | [Server-Plan](docs/wiki/Server-Plan.md) · [구성 기록](docs/infra/ec2-dev-server.md) |
+| 서버 | AWS EC2 t3.micro 1대 (시드니) · systemd · Nginx HTTPS (Let's Encrypt) | [Server-Plan](docs/wiki/Server-Plan.md) · [구성 기록](docs/infra/ec2-dev-server.md) |
 | 협업 | GitHub Issues / Projects / Wiki | |
 
 초기안의 기기 내부 SQLite 저장은 EC2 API + PostgreSQL 구성으로 바뀌었습니다. 모바일 → HTTPS Nginx → 내부 Node API → 같은 EC2의 PostgreSQL 순서로 연결하며 API·DB 포트는 인터넷에 공개하지 않습니다.
