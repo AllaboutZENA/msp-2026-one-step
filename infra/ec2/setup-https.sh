@@ -34,7 +34,7 @@ NGINX
 fi
 
 log "nginx site"
-sed "s/__HOST__/$HOST/g" "$TEMPLATE" | sudo tee "$SITE" >/dev/null
+sudo sed "s/__HOST__/$HOST/g" "$TEMPLATE" | sudo tee "$SITE" >/dev/null
 sudo ln -sf "$SITE" /etc/nginx/sites-enabled/magam-api.conf
 sudo nginx -t -q
 sudo systemctl enable --now nginx >/dev/null
