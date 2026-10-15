@@ -32,3 +32,4 @@
 | --- | --- | --- | --- | --- |
 | 2026-10-02 | codex/pc-setup | macOS 15.3.2 · iPhone 16 시뮬레이터(iOS 18.3) · Expo Go 57.0.9 | 앱 첫 화면, API `/health`, `/health/db`(PostgreSQL 18.6) 연결 | 통과 · 실기기·EC2 미검증 |
 | 2026-10-15 | codex/api-auth-assignments | macOS · 로컬 PostgreSQL 18 (`npm test`, 합성 계정) | T01 필수값 검증, T04 연쇄 삭제, T05 진행률, T07 정렬, T08 제출 분리, T13 소유자 검사, 만료·로그아웃 토큰 | 통과 (자동 테스트 23개) |
+| 2026-10-15 | codex/mobile-core-screens | iPhone 16 시뮬레이터(iOS 18.3) · Expo Go · 로컬 API, 그리고 SSH 터널로 EC2 API | Maestro `core-flow.yaml`: 가입 → 필수값 안내(T01) → 등록 → 앱 재시작 후 서버 데이터 유지(T02) → 제출 표시·목록 이동(T08) → 설정·로그아웃 | 통과 (로컬·EC2 각각) · 실기기 미검증 |
