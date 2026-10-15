@@ -14,9 +14,9 @@
 | --- | --- | --- |
 | EC2 | `i-06cec8f169a4b3014` · `magam-hankan-dev` · t3.micro · ap-southeast-2a | Ubuntu 26.04.1 LTS, CPU 크레딧 **standard**(초과 과금 방지), IMDSv2 필수 |
 | EBS | gp3 20 GiB, 암호화, 종료 시 삭제 | 스왑 1 GiB 포함 |
-| 보안 그룹 | `magam-hankan-dev-sg` | 인바운드는 **SSH 22, 개발자 맥 IP /32만**. 80·443·3000·5432 미개방 |
+| 보안 그룹 | `magam-hankan-dev-sg` | 인바운드: **SSH 22는 개발자 맥 IP /32만**, 80(인증서 발급·HTTPS 리다이렉트)·443(HTTPS) 공개. 3000·5432 미개방 |
 | 키 페어 | `magam-hankan-dev` (ed25519) | 개인 키는 개발자 맥 `~/.ssh/magam-hankan-ec2`에만 존재 |
-| 공인 IPv4 | 자동 할당 (Elastic IP 아님) | 인스턴스 중지·시작 시 바뀜. 재부팅은 유지 |
+| 공인 IPv4 | Elastic IP `magam-hankan-dev-eip` (2026-10-15부터) | 중지·시작해도 유지. 인스턴스에 붙어 있는 동안 기존과 같은 $0.005/시간, **인스턴스를 중지해도 IP 요금은 계속** |
 
 ### 예상 비용 (AWS Price List API, 시드니 온디맨드)
 
@@ -32,11 +32,19 @@
 ## 서버 구성
 
 ```text
-인터넷 ──(22, 개발자 IP만)──> sshd
-                               │ SSH 터널
+휴대폰 앱 ──HTTPS 443──> Nginx (Let's Encrypt, /auth/ 요청 제한)
+인터넷 ──(80)──> Nginx: 인증서 발급 경로 + HTTPS 리다이렉트
+개발자 맥 ──(22, 개발자 IP만)──> sshd
             127.0.0.1:3000  magam-api.service (Node 24.21.0, User=magam)
             127.0.0.1:5432  PostgreSQL 18.6 (DB magam_hankan, 역할 magam_app)
 ```
+
+### HTTPS (2026-10-15, #14)
+
+- 주소: `https://<Elastic IP를 하이픈으로 바꾼 값>.sslip.io` — sslip.io는 이름에 들어 있는 IP로 응답하는 공개 DNS라 도메인 구입 없이 Let's Encrypt 인증서를 받을 수 있습니다. 정확한 주소는 팀 채널로 공유하고 공개 저장소에는 적지 않습니다. 정식 도메인을 사면 `setup-https.sh <도메인>`만 다시 실행합니다.
+- 설치: `infra/ec2/setup-https.sh <host>` — Nginx·certbot 설치, webroot 방식 인증서 발급, `nginx-magam.conf.template` 적용, 갱신 후 Nginx 재적용 훅, `certbot renew --dry-run` 확인.
+- 인증서: Let's Encrypt, 90일, `certbot.timer`가 자동 갱신.
+- 보안: TLS 1.2/1.3, HSTS, `X-Content-Type-Options`, 본문 256KB 제한, `/auth/`는 IP당 분당 10회(순간 5회 추가)로 제한해 비밀번호 대입을 늦춥니다.
 
 - 설치·배포: `infra/ec2/setup-server.sh [git-ref]` — 재실행 가능. 스왑, PostgreSQL, Node(공식 tarball·체크섬 확인), 앱 사용자 `magam`, 코드(`/srv/magam-hankan`, 지정 ref로 detach), `npm ci`·빌드·마이그레이션, systemd 등록, 백업 cron.
 - 비밀 값: DB 비밀번호는 서버에서 `openssl rand`로 생성해 `/etc/magam-hankan/api.env`(root:magam 640)에만 저장. 출력·커밋하지 않음.
@@ -61,7 +69,7 @@ ssh magam-dev 'systemctl status magam-api --no-pager; journalctl -u magam-api -n
 ssh magam-dev 'sudo cat "$(sudo ls -1t /var/backups/magam-hankan/*.dump | head -1)"' > magam_hankan-backup.dump
 ```
 
-시뮬레이터에서 서버를 쓰려면 터널을 연 뒤 `apps/mobile/.env.local`의 `EXPO_PUBLIC_API_BASE_URL=http://localhost:3001`로 바꾸고 `npx expo start --clear`로 다시 시작합니다(셸 환경 변수보다 `.env.local`이 우선 적용됨을 확인).
+앱(시뮬레이터·실제 휴대폰)에서 서버를 쓰려면 `apps/mobile/.env.local`의 `EXPO_PUBLIC_API_BASE_URL`을 HTTPS 주소로 두고 `npx expo start --clear`로 다시 시작합니다(셸 환경 변수보다 `.env.local`이 우선). HTTPS 이전에 쓰던 SSH 터널(`http://localhost:3001`)은 서버 내부 확인용으로 남겨 둡니다.
 
 개발자 IP가 바뀌면 SSH가 막힙니다. 콘솔 또는 `aws ec2 authorize-security-group-ingress`로 새 IP /32를 추가하고 이전 규칙을 삭제합니다.
 
@@ -80,8 +88,18 @@ ssh magam-dev 'sudo cat "$(sudo ls -1t /var/backups/magam-hankan/*.dump | head -
 
 ![시뮬레이터에서 EC2 연결](../setup/img/2026-10-02-ios-simulator-ec2.png)
 
+### HTTPS 검증 (2026-10-15)
+
+| 항목 | 결과 |
+| --- | --- |
+| `https://…/health`, `/health/db` (맥에서) | 200 |
+| `http://` 요청 | 301 → https |
+| 인증서 | Let's Encrypt, 만료 2027-01-13, 갱신 dry-run 통과 |
+| 공인 IP의 3000·5432 | 차단 |
+| `/auth/login` 연속 9회 | 6회 401 후 429 |
+| 시뮬레이터 앱 → HTTPS → EC2 (Maestro E2E 전체) | 통과 |
+
 ## 아직 하지 않은 것
 
-- **HTTPS·Nginx**: 도메인이 없어 미구성. 실제 휴대폰은 아직 서버에 붙을 수 없습니다(터널은 맥 전용). 도메인 확보 또는 IP 인증서 방식 결정 후 443만 개방합니다.
-- 고정 IP(Elastic IP), 서버 밖 백업 보관, 개발자별 서버 작업 폴더·계정(현재 `ubuntu` 한 계정과 키 하나), 비용 알림(Budgets).
-- 인증·소유자 검사 API (W05–W06).
+- 실제 휴대폰에서 HTTPS 서버 연결 확인 (#14, #5)
+- 서버 밖 백업 보관, 개발자별 서버 작업 폴더·계정(현재 `ubuntu` 한 계정과 키 하나), 비용 알림(Budgets).
