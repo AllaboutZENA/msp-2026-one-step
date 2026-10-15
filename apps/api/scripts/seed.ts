@@ -1,6 +1,7 @@
 // Inserts synthetic demo data for local development only. Never put real
 // student data here. Fixed ids make the script safe to re-run.
 import pg from 'pg';
+import { hashPassword } from '../src/auth/password.js';
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
@@ -15,9 +16,11 @@ if (process.env.NODE_ENV === 'production') {
 const DAY = 24 * 60 * 60 * 1000;
 const now = Date.now();
 
+// Local demo logins (synthetic): demo-a@example.com / demo-b@example.com, password below.
+const DEMO_PASSWORD = 'demo-password-1';
 const users = [
-  { id: '00000000-0000-4000-8000-000000000001', name: '테스트 사용자 A' },
-  { id: '00000000-0000-4000-8000-000000000002', name: '테스트 사용자 B' },
+  { id: '00000000-0000-4000-8000-000000000001', name: '테스트 사용자 A', email: 'demo-a@example.com' },
+  { id: '00000000-0000-4000-8000-000000000002', name: '테스트 사용자 B', email: 'demo-b@example.com' },
 ];
 const assignments = [
   { id: '10000000-0000-4000-8000-000000000001', user: users[0].id, course: '모바일 SW', title: '주간 보고서 작성', due: now + 2 * DAY },
@@ -34,10 +37,12 @@ const client = new pg.Client({ connectionString: databaseUrl });
 await client.connect();
 try {
   await client.query('BEGIN');
+  const passwordHash = await hashPassword(DEMO_PASSWORD);
   for (const u of users) {
     await client.query(
-      'INSERT INTO users (id, display_name) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING',
-      [u.id, u.name],
+      `INSERT INTO users (id, display_name, email, password_hash) VALUES ($1, $2, $3, $4)
+       ON CONFLICT (id) DO UPDATE SET email = EXCLUDED.email, password_hash = EXCLUDED.password_hash`,
+      [u.id, u.name, u.email, passwordHash],
     );
   }
   for (const a of assignments) {
