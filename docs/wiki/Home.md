@@ -5,6 +5,7 @@
 - [요구사항](https://github.com/AllaboutZENA/msp-2026-one-step/wiki/Requirements): 대상 사용자, 핵심 기능, 완료 기준
 - [구조 설계](https://github.com/AllaboutZENA/msp-2026-one-step/wiki/Architecture): 화면과 데이터 구조, 동작 규칙
 - [서버 구성안](Server-Plan.md): EC2 t3.micro 한 대의 API·DB 운영 계획
+- [API 명세](API.md): 인증·과제 엔드포인트와 오류 형식
 - [테스트 계획](https://github.com/AllaboutZENA/msp-2026-one-step/wiki/Test%E2%80%90Plan): 구현 후 확인할 시나리오
 
 ## 문서 관리

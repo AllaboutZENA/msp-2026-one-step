@@ -1,5 +1,8 @@
 import express, { type ErrorRequestHandler } from 'express';
 import type { Queryable } from './db.js';
+import { HttpError } from './http.js';
+import { assignmentsRouter } from './routes/assignments.js';
+import { authRouter } from './routes/auth.js';
 
 export interface AppDeps {
   db?: Queryable;
@@ -8,6 +11,7 @@ export interface AppDeps {
 export function createApp({ db }: AppDeps = {}) {
   const app = express();
   app.disable('x-powered-by');
+  app.set('trust proxy', 'loopback');
   app.use(express.json({ limit: '100kb' }));
 
   app.get('/health', (_req, res) => {
@@ -31,11 +35,28 @@ export function createApp({ db }: AppDeps = {}) {
     }
   });
 
+  if (db) {
+    app.use('/auth', authRouter(db));
+    app.use('/assignments', assignmentsRouter(db));
+  } else {
+    app.use(['/auth', '/assignments'], (_req, res) => {
+      res.status(503).json({ status: 'unconfigured', message: 'DATABASE_URL is not set' });
+    });
+  }
+
   app.use((_req, res) => {
     res.status(404).json({ status: 'error', message: 'not found' });
   });
 
   const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+    if (err instanceof HttpError) {
+      res.status(err.status).json({ status: 'error', message: err.message, ...(err.fields && { fields: err.fields }) });
+      return;
+    }
+    if (err?.type === 'entity.parse.failed' || err?.type === 'entity.too.large') {
+      res.status(err.status ?? 400).json({ status: 'error', message: '요청 본문을 읽을 수 없습니다' });
+      return;
+    }
     console.error(err);
     res.status(500).json({ status: 'error', message: 'internal server error' });
   };
