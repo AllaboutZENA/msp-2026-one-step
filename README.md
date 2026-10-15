@@ -2,7 +2,7 @@
 
 대학생이 과제를 작은 할 일로 나누고 마감과 진행률을 확인하는 개인용 모바일 앱입니다.
 
-> 상태: 개발 환경 세팅 단계. `apps/mobile`(Expo)과 `apps/api`(Express) 최소 실행 골격만 있으며 핵심 기능은 아직 구현하지 않았습니다. 수업의 README_sample.md 원본을 받으면 항목과 형식을 대조하여 수정합니다.
+> 상태: 핵심 기능 구현 중 (2026-10-15). 로그인, 과제 등록·조회·상세·제출 표시가 앱과 EC2 API·PostgreSQL에서 동작합니다. 수정·삭제 화면, 세부 작업, 알림, HTTPS는 진행 전입니다. 수업의 README_sample.md 원본을 받으면 항목과 형식을 대조하여 수정합니다.
 
 ## Team Members
 
@@ -66,9 +66,14 @@ npm --prefix apps/api run dev          # http://127.0.0.1:3000/health
 npm --prefix apps/mobile run ios       # iOS 시뮬레이터에서 Expo Go로 열기
 
 # 5) 검사
-npm --prefix apps/api run typecheck && npm --prefix apps/api test
+npm --prefix apps/api run typecheck && npm --prefix apps/api test   # TEST_DATABASE_URL 있으면 DB 통합 테스트 포함
 npm --prefix apps/mobile run typecheck
+
+# 6) 앱 E2E (Maestro, iOS 시뮬레이터 + Metro 실행 중)
+maestro test apps/mobile/e2e/core-flow.yaml
 ```
+
+로컬 시드 데이터의 데모 계정(합성): `demo-a@example.com` / `demo-password-1`. 서버에는 시드를 넣지 않습니다.
 
 EC2 개발 서버 사용법(SSH 터널, 배포 명령)은 [docs/infra/ec2-dev-server.md](docs/infra/ec2-dev-server.md)에 있습니다.
 
