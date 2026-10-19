@@ -26,7 +26,7 @@ npm run ios                                          # 터미널 2: iOS 시뮬�
 | 이름 | GitHub | 담당 역할 (중간 발표 기준) |
 | --- | --- | --- |
 | 박초원 (대표) | [AllaboutZENA](https://github.com/AllaboutZENA) | 기획·요구사항, 화면·데이터 설계, API·DB, 앱 화면, AWS 서버, 테스트·문서 |
-| (확인 중) | [min2030](https://github.com/min2030) | 담당 확정 후 기입 |
+| 서민호 | [min2030](https://github.com/min2030) | — |
 
 학번·개인 연락처·로그인 정보는 저장소에 적지 않습니다. 코드·테스트·문서 작성에는 Claude Code(AI)의 보조를 받았고, 모든 변경은 PR과 자동 테스트로 확인했습니다.
 
