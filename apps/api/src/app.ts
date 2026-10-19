@@ -58,7 +58,8 @@ export function createApp({ db }: AppDeps = {}) {
       return;
     }
     console.error(err);
-    res.status(500).json({ status: 'error', message: 'internal server error' });
+    // The app shows this message as-is, so keep it user-facing and free of internals.
+    res.status(500).json({ status: 'error', message: '서버에 일시적인 문제가 생겼어요. 잠시 후 다시 시도해 주세요' });
   };
   app.use(errorHandler);
 

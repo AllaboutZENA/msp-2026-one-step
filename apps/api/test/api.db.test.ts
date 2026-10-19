@@ -162,6 +162,24 @@ describe.skipIf(!url)('API with PostgreSQL', () => {
       expect(undone.body.assignment.submittedAt).toBeNull();
     });
 
+    it('edits due date, title and memo; the list re-sorts by the new due date (T03)', async () => {
+      const token = await signup('k@example.com');
+      const first = await create(token, { courseName: 'OS', title: '먼저 마감', dueAt: '2026-10-22T00:00:00Z', memo: '메모' });
+      await create(token, { courseName: 'OS', title: '나중 마감', dueAt: '2026-10-25T00:00:00Z' });
+      const id = first.body.assignment.id;
+
+      const edited = await request(app)
+        .patch(`/assignments/${id}`)
+        .set(auth(token))
+        .send({ title: '미뤄진 과제', dueAt: '2026-10-28T14:59:00+09:00', memo: null });
+      expect(edited.status).toBe(200);
+
+      const detail = await request(app).get(`/assignments/${id}`).set(auth(token));
+      expect(detail.body.assignment).toMatchObject({ title: '미뤄진 과제', dueAt: '2026-10-28T05:59:00.000Z', memo: null });
+      const list = await request(app).get('/assignments').set(auth(token));
+      expect(list.body.assignments.map((a: { title: string }) => a.title)).toEqual(['나중 마감', '미뤄진 과제']);
+    });
+
     it('reports subtask progress and deletes subtasks with the assignment (T04, T05)', async () => {
       const token = await signup('i@example.com');
       const { body } = await create(token, { courseName: 'AI', title: '보고서', dueAt: '2026-10-23T00:00:00Z' });

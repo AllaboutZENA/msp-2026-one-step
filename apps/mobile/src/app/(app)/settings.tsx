@@ -18,6 +18,11 @@ function StatusRow({ label, result }: { label: string; result: CheckResult | nul
   );
 }
 
+async function checkAll(): Promise<[CheckResult, CheckResult]> {
+  const a = await checkApi();
+  return [a, a.state === 'ok' ? await checkDb() : { state: a.state, detail: 'API 확인 후 검사' }];
+}
+
 export default function SettingsScreen() {
   const { state, logOut } = useAuth();
   const [apiStatus, setApiStatus] = useState<CheckResult | null>(null);
@@ -27,14 +32,23 @@ export default function SettingsScreen() {
   const runChecks = useCallback(async () => {
     setApiStatus(null);
     setDbStatus(null);
-    const a = await checkApi();
+    const [a, d] = await checkAll();
     setApiStatus(a);
-    setDbStatus(a.state === 'ok' ? await checkDb() : { state: a.state, detail: 'API 확인 후 검사' });
+    setDbStatus(d);
   }, []);
 
+  // State starts as "확인 중…", so the first check only fills in results.
   useEffect(() => {
-    runChecks();
-  }, [runChecks]);
+    let alive = true;
+    checkAll().then(([a, d]) => {
+      if (!alive) return;
+      setApiStatus(a);
+      setDbStatus(d);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
