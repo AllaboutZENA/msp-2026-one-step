@@ -19,7 +19,7 @@ npm run ios                                          # 터미널 2: iOS 시뮬�
 
 ## Team Members
 
-팀명: one-step (가칭) · 저장소명: `msp-2026-one-step`
+팀명: **민초** · 저장소명: `msp-2026-one-step`
 
 저장소 소유 계정: [AllaboutZENA](https://github.com/AllaboutZENA).
 
