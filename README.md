@@ -67,10 +67,12 @@ npm --prefix apps/mobile run ios       # iOS 시뮬레이터에서 Expo Go로 �
 
 # 5) 검사
 npm --prefix apps/api run typecheck && npm --prefix apps/api test   # TEST_DATABASE_URL 있으면 DB 통합 테스트 포함
-npm --prefix apps/mobile run typecheck
+npm --prefix apps/mobile run typecheck && npm --prefix apps/mobile run lint
 
 # 6) 앱 E2E (Maestro, iOS 시뮬레이터 + Metro 실행 중)
-maestro test apps/mobile/e2e/core-flow.yaml
+maestro test apps/mobile/e2e/core-flow.yaml      # 가입·등록·재실행·제출
+maestro test apps/mobile/e2e/manage-flow.yaml    # 과목 필터·수정·삭제
+bash apps/mobile/e2e/run-save-failure.sh         # 로컬 DB를 잠시 멈추고 저장 실패·재시도 확인
 ```
 
 로컬 시드 데이터의 데모 계정(합성): `demo-a@example.com` / `demo-password-1`. 서버에는 시드를 넣지 않습니다.
