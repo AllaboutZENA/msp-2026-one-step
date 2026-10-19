@@ -1,6 +1,6 @@
-import { Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Banner, Button, ProgressBar } from '../../../components/ui';
 import { api, ApiError } from '../../../lib/api';
@@ -38,6 +38,27 @@ export default function AssignmentDetailScreen() {
     } catch (err) {
       setError(err instanceof ApiError ? err.message : '변경하지 못했어요');
     } finally {
+      setBusy(false);
+    }
+  }
+
+  function confirmDelete() {
+    if (!item) return;
+    const extra = item.subtasks.length ? `\n세부 작업 ${item.subtasks.length}개도 함께 삭제돼요.` : '';
+    Alert.alert('과제를 삭제할까요?', `"${item.title}"을(를) 삭제하면 되돌릴 수 없어요.${extra}`, [
+      { text: '취소', style: 'cancel' },
+      { text: '삭제', style: 'destructive', onPress: remove },
+    ]);
+  }
+
+  async function remove() {
+    if (!item) return;
+    setBusy(true);
+    try {
+      await api.deleteAssignment(item.id);
+      router.back();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : '삭제하지 못했어요');
       setBusy(false);
     }
   }
@@ -87,6 +108,20 @@ export default function AssignmentDetailScreen() {
         busy={busy}
       />
       <Text style={styles.muted}>진행률이 100%여도 자동으로 제출 완료되지 않아요. 실제로 제출한 뒤 눌러 주세요.</Text>
+
+      <View style={styles.actions}>
+        <View style={{ flex: 1 }}>
+          <Button
+            label="수정"
+            variant="secondary"
+            onPress={() => router.push({ pathname: '/edit/[id]', params: { id: item.id } })}
+            disabled={busy}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Button label="삭제" variant="danger" onPress={confirmDelete} disabled={busy} />
+        </View>
+      </View>
     </ScrollView>
   );
 }
@@ -103,4 +138,5 @@ const styles = StyleSheet.create({
   subtask: { fontSize: 15, color: colors.ink },
   subtaskDone: { color: colors.ink3, textDecorationLine: 'line-through' },
   muted: { fontSize: 13, color: colors.ink3 },
+  actions: { flexDirection: 'row', gap: 10, marginTop: 12 },
 });

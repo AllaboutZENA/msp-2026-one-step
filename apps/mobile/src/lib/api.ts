@@ -77,4 +77,5 @@ export const api = {
     request<{ assignment: Assignment }>('POST', '/assignments', input).then((r) => r.assignment),
   updateAssignment: (id: string, patch: Partial<AssignmentInput> & { submitted?: boolean }) =>
     request<{ assignment: Assignment }>('PATCH', `/assignments/${encodeURIComponent(id)}`, patch).then((r) => r.assignment),
+  deleteAssignment: (id: string) => request<void>('DELETE', `/assignments/${encodeURIComponent(id)}`),
 };

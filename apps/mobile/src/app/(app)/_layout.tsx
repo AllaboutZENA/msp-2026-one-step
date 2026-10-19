@@ -27,6 +27,7 @@ export default function AppLayout() {
       <Stack.Screen name="index" options={{ title: '마감한칸' }} />
       <Stack.Screen name="new" options={{ title: '과제 등록', presentation: 'modal' }} />
       <Stack.Screen name="assignment/[id]" options={{ title: '과제 상세' }} />
+      <Stack.Screen name="edit/[id]" options={{ title: '과제 수정', presentation: 'modal' }} />
       <Stack.Screen name="settings" options={{ title: '설정' }} />
     </Stack>
   );
