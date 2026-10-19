@@ -1,0 +1,14 @@
+# T14 part 3 (service back): the same form saves on retry.
+appId: host.exp.Exponent
+---
+- tapOn: "저장"
+- extendedWaitUntil:
+    visible: ".*T14 저장 실패 후 재시도.*"
+    timeout: 20000
+- assertVisible: "\\+ 과제 등록"
+- takeScreenshot: e2e/screenshots/22-retry-saved-${MODE}
+- tapOn: "설정"
+- tapOn: "로그아웃"
+- extendedWaitUntil:
+    visible: "가입하고 시작하기|로그인"
+    timeout: 15000

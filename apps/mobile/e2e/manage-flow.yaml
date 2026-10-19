@@ -1,0 +1,100 @@
+# W07: edit, delete (confirm/cancel) and course filter on the iOS simulator via Expo Go.
+# Prereqs: API running at EXPO_PUBLIC_API_BASE_URL, Metro on :8081.
+# Run: maestro test apps/mobile/e2e/manage-flow.yaml
+appId: host.exp.Exponent
+env:
+  METRO_URL: exp://127.0.0.1:8081
+---
+- runFlow: common/fresh-account.yaml
+- runFlow:
+    file: common/create-assignment.yaml
+    env:
+      COURSE: "모바일 SW"
+      TITLE: "W07 수정 전 보고서"
+- runFlow:
+    file: common/create-assignment.yaml
+    env:
+      COURSE: "데이터베이스"
+      TITLE: "W07 삭제할 실습"
+
+# Course filter: chips appear once there are two courses
+- tapOn:
+    id: "filter-데이터베이스"
+- assertVisible: ".*W07 삭제할 실습.*"
+- assertNotVisible: ".*W07 수정 전 보고서.*"
+- takeScreenshot: e2e/screenshots/11-filter-course
+- tapOn: "제출 완료"
+- assertVisible: "'데이터베이스' 과목의 제출한 과제가 없어요"
+- takeScreenshot: e2e/screenshots/12-filter-empty
+- tapOn: "전체 과목 보기"
+- tapOn: "미제출 · 마감순"
+- assertVisible: ".*W07 수정 전 보고서.*"
+- assertVisible: ".*W07 삭제할 실습.*"
+
+# Edit title and memo, then restart the app: the change persists (T03)
+- tapOn: ".*W07 수정 전 보고서.*"
+- extendedWaitUntil:
+    visible: "수정"
+    timeout: 15000
+- tapOn: "수정"
+- extendedWaitUntil:
+    visible: "변경 저장"
+    timeout: 15000
+- assertVisible: "W07 수정 전 보고서"
+- tapOn:
+    id: "title-input"
+- eraseText: 30
+- inputText: "W07 수정 후 보고서"
+- tapOn:
+    id: "memo-input"
+- inputText: "수정 화면에서 메모 추가"
+- tapOn: "마감 일시"
+- takeScreenshot: e2e/screenshots/13-edit-form
+- tapOn: "변경 저장"
+- extendedWaitUntil:
+    visible: "수정 화면에서 메모 추가"
+    timeout: 15000
+- assertVisible: "W07 수정 후 보고서"
+- takeScreenshot: e2e/screenshots/14-detail-edited
+- stopApp
+- openLink: ${METRO_URL}
+- extendedWaitUntil:
+    visible: ".*W07 수정 후 보고서.*"
+    timeout: 60000
+- assertNotVisible: ".*W07 수정 전 보고서.*"
+
+# Delete: cancel keeps it, confirm removes it (T04 UI)
+- tapOn: ".*W07 삭제할 실습.*"
+- extendedWaitUntil:
+    visible: "삭제"
+    timeout: 15000
+- tapOn: "삭제"
+- extendedWaitUntil:
+    visible: "과제를 삭제할까요?"
+    timeout: 5000
+- takeScreenshot: e2e/screenshots/15-delete-confirm
+- tapOn: "취소"
+- assertNotVisible: "과제를 삭제할까요?"
+- assertVisible: "W07 삭제할 실습"
+- tapOn: "삭제"
+- extendedWaitUntil:
+    visible: "과제를 삭제할까요?"
+    timeout: 5000
+- tapOn:
+    text: "삭제"
+    below: "과제를 삭제할까요?"
+- extendedWaitUntil:
+    visible: "\\+ 과제 등록"
+    timeout: 15000
+- assertNotVisible: ".*W07 삭제할 실습.*"
+- assertVisible: ".*W07 수정 후 보고서.*"
+# Only one course left, so the filter bar hides again.
+- assertNotVisible:
+    id: "filter-all"
+- takeScreenshot: e2e/screenshots/16-home-after-delete
+
+- tapOn: "설정"
+- tapOn: "로그아웃"
+- extendedWaitUntil:
+    visible: "가입하고 시작하기|로그인"
+    timeout: 15000

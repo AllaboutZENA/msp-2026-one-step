@@ -30,6 +30,8 @@ env:
 - tapOn:
     id: "password-input"
 - inputText: "e2e-password-1"
+# Dismiss the keyboard first: with a notice banner shown it can cover the button.
+- tapOn: "비밀번호"
 - tapOn: "가입하고 시작하기"
 # iOS may offer to save the password; dismiss it if shown.
 - tapOn:
