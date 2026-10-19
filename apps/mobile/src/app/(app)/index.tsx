@@ -1,6 +1,6 @@
 import { Link, Stack, router, useFocusEffect } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Banner, Button, ProgressBar } from '../../components/ui';
 import { api, ApiError } from '../../lib/api';
@@ -15,6 +15,14 @@ export default function HomeScreen() {
   const [items, setItems] = useState<Assignment[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  // Course filter is applied on the phone: the list is already per-user and small.
+  const [course, setCourse] = useState<string | null>(null);
+  const courses = useMemo(() => {
+    const names = new Set((items ?? []).map((a) => a.courseName));
+    if (course) names.add(course);
+    return [...names].sort((a, b) => a.localeCompare(b, 'ko'));
+  }, [items, course]);
+  const visible = useMemo(() => (course ? (items ?? []).filter((a) => a.courseName === course) : (items ?? [])), [items, course]);
 
   const load = useCallback(async (which: Tab) => {
     try {
@@ -68,6 +76,24 @@ export default function HomeScreen() {
         ))}
       </View>
 
+      {courses.length > 1 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips} style={styles.chipBar}>
+          {[null, ...courses].map((c) => (
+            <Pressable
+              key={c ?? '__all'}
+              testID={c ? `filter-${c}` : 'filter-all'}
+              accessibilityRole="button"
+              accessibilityLabel={`과목 필터 ${c ?? '전체'}`}
+              accessibilityState={{ selected: course === c }}
+              onPress={() => setCourse(c)}
+              style={[styles.chip, course === c && styles.chipOn]}
+            >
+              <Text style={[styles.chipText, course === c && styles.chipTextOn]}>{c ?? '전체'}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      )}
+
       {!!error && (
         <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
           <Banner>{error}</Banner>
@@ -75,13 +101,20 @@ export default function HomeScreen() {
       )}
 
       <FlatList
-        data={items ?? []}
+        data={visible}
         keyExtractor={(a) => a.id}
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         ListEmptyComponent={
           items === null ? (
             <Text style={styles.empty}>불러오는 중…</Text>
+          ) : course ? (
+            <View style={styles.emptyBox}>
+              <Text style={styles.emptyTitle}>{`'${course}' 과목의 ${tab === 'open' ? '남은' : '제출한'} 과제가 없어요`}</Text>
+              <Pressable accessibilityRole="button" onPress={() => setCourse(null)} hitSlop={8}>
+                <Text style={styles.headerLink}>전체 과목 보기</Text>
+              </Pressable>
+            </View>
           ) : (
             <View style={styles.emptyBox}>
               <Text style={styles.emptyTitle}>{tab === 'open' ? '남은 과제가 없어요' : '아직 제출한 과제가 없어요'}</Text>
@@ -137,6 +170,12 @@ const styles = StyleSheet.create({
   tabOn: { backgroundColor: colors.surface },
   tabText: { color: colors.ink3, fontWeight: '600' },
   tabTextOn: { color: colors.ink },
+  chipBar: { flexGrow: 0 },
+  chips: { paddingHorizontal: 16, paddingBottom: 8, gap: 8 },
+  chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, borderWidth: 1, borderColor: colors.line, backgroundColor: colors.surface },
+  chipOn: { backgroundColor: colors.accent, borderColor: colors.accent },
+  chipText: { fontSize: 13.5, color: colors.ink2, fontWeight: '600' },
+  chipTextOn: { color: '#fff' },
   list: { padding: 16, paddingTop: 8, gap: 10, paddingBottom: 100 },
   row: { backgroundColor: colors.surface, borderRadius: 14, padding: 14, gap: 6, borderWidth: 1, borderColor: colors.surface },
   rowOverdue: { borderColor: colors.danger },
