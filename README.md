@@ -2,30 +2,47 @@
 
 대학생이 과제를 작은 할 일로 나누고 마감과 진행률을 확인하는 개인용 모바일 앱입니다.
 
-> 상태: 핵심 기능 구현 중 (2026-10-15). 로그인, 과제 등록·조회·상세·제출 표시가 앱과 EC2 API·PostgreSQL에서 동작합니다. 수정·삭제 화면, 세부 작업, 알림은 진행 전이며 서버는 HTTPS로 연결됩니다. 수업의 README_sample.md 원본을 받으면 항목과 형식을 대조하여 수정합니다.
+> 상태: **중간 발표 안정본 (2026-10, [`v0.1.0-midterm`](https://github.com/AllaboutZENA/msp-2026-one-step/releases/tag/v0.1.0-midterm))**. 회원가입·로그인, 과제 등록·조회·수정·삭제, 마감순 목록·지연 표시, 과목 필터, 제출 완료가 iOS 앱 ↔ EC2 HTTPS API ↔ PostgreSQL에서 동작합니다. 세부 작업·진행률 화면(9주차)과 로컬 알림(10주차)은 진행 전입니다.
+
+## 빠른 실행
+
+```bash
+npm run install:all
+cp apps/api/.env.example apps/api/.env              # DATABASE_URL 입력
+createdb magam_hankan_dev && npm --prefix apps/api run db:migrate && npm --prefix apps/api run db:seed
+npm run api                                          # 터미널 1: http://127.0.0.1:3000/health
+cp apps/mobile/.env.example apps/mobile/.env.local
+npm run ios                                          # 터미널 2: iOS 시뮬레이터 + Expo Go
+```
+
+합성 데모 계정 `demo-a@example.com` / `demo-password-1`로 로그인합니다. 자세한 설명은 아래 [Run](#run)에 있습니다.
 
 ## Team Members
 
 팀명: one-step (가칭) · 저장소명: `msp-2026-one-step`
 
-저장소 소유 계정: [AllaboutZENA](https://github.com/AllaboutZENA). 팀 인원·실명·역할은 확인 후 아래 표를 갱신합니다.
+저장소 소유 계정: [AllaboutZENA](https://github.com/AllaboutZENA).
 
-| 이름 | GitHub | 담당 역할 | 실제 익숙한 기술 |
-| --- | --- | --- | --- |
-| [팀원 A] | [GitHub ID] | 과제 목록·등록·수정·저장 — 제안 | [본인 입력] |
-| [팀원 B, 2인일 때] | [GitHub ID] | 세부 작업·진행률·마감·알림 — 제안 | [본인 입력] |
+| 이름 | GitHub | 담당 역할 (중간 발표 기준) |
+| --- | --- | --- |
+| 박초원 (대표) | [AllaboutZENA](https://github.com/AllaboutZENA) | 기획·요구사항, 화면·데이터 설계, API·DB, 앱 화면, AWS 서버, 테스트·문서 |
+| (확인 중) | [min2030](https://github.com/min2030) | 담당 확정 후 기입 |
 
-1인 팀이면 두 번째 행을 삭제합니다. 학번·개인 연락처·로그인 정보는 저장소에 적지 않습니다.
+학번·개인 연락처·로그인 정보는 저장소에 적지 않습니다. 코드·테스트·문서 작성에는 Claude Code(AI)의 보조를 받았고, 모든 변경은 PR과 자동 테스트로 확인했습니다.
 
 ## Target User & Problem
 
 대상은 여러 과목의 과제와 발표 준비를 관리하는 대학생입니다. 마감일만 적었을 때 남은 작업을 파악하기 어렵다는 가설에서 출발합니다. 실제 사용자 확인은 예정되어 있으며 결과에 따라 요구사항을 수정합니다.
 
-## Core Features — 계획
+## Core Features
 
-1. 과목명을 포함한 과제 등록·조회·수정·삭제와 서버(PostgreSQL) 저장.
-2. 과제별 세부 작업 체크와 진행률 계산. 과제 제출 완료는 별도 표시.
-3. 마감순 조회·지연 표시·완료 목록과 로컬 알림.
+| 기능 | 상태 |
+| --- | --- |
+| 회원가입·로그인·로그아웃 (세션 토큰, 본인 과제만 접근) | 구현 |
+| 과제 등록·조회·수정·삭제와 서버(PostgreSQL) 저장, 저장 실패 시 입력 유지 | 구현 |
+| 마감순 목록, D-day·지연 표시, 과목 필터, 제출 완료·되돌리기 | 구현 |
+| 세부 작업 체크와 진행률 화면 (진행률 계산은 API에 구현) | 9주차 |
+| 마감 하루 전 로컬 알림 | 10주차 |
 
 알림은 휴대폰의 로컬 알림이며 서버 푸시와 구분합니다. 실제 기기 실험 후 확정합니다. 공용 서버 DB를 쓰므로 최소 사용자 인증과 소유자별 접근 검사를 포함합니다(인증 방식은 3–4주차 결정). 학교 LMS 연동, AI 자동 계획, 채팅, 결제, 공동편집, 다중 기기 실시간 동기화, 앱스토어 출시는 이번 범위에 포함하지 않습니다.
 
@@ -109,7 +126,7 @@ iOS 시뮬레이터는 맥의 네트워크를 공유하므로 `http://localhost:
 - Repository: [msp-2026-one-step](https://github.com/AllaboutZENA/msp-2026-one-step)
 - Projects: [마감한칸 개발 보드](https://github.com/users/AllaboutZENA/projects/3)
 - Wiki: [설계 문서](https://github.com/AllaboutZENA/msp-2026-one-step/wiki)
-- Demo / Release: [실제 준비 후 입력]
+- Release: [v0.1.0-midterm](https://github.com/AllaboutZENA/msp-2026-one-step/releases/tag/v0.1.0-midterm) (중간 발표 안정본, 시연 영상 첨부)
 
 개인 기여와 AI 보조 사용은 실제 작업·수정·검증 내역에 맞춰 [기여 기록 틀](docs/contributions/TEMPLATE.md)에 기록합니다.
 
