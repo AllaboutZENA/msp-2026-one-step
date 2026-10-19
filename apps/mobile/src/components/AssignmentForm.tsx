@@ -88,6 +88,7 @@ export function AssignmentForm({
               value={dueAt}
               mode="datetime"
               display="compact"
+              locale="ko-KR"
               onValueChange={(_e, date) => setDueAt(date)}
               accessibilityLabel="마감 일시"
               style={{ alignSelf: 'flex-start' }}

@@ -51,7 +51,9 @@ async function request<T>(method: string, path: string, body?: unknown, timeoutM
   const data = await res.json().catch(() => null);
   if (!res.ok) {
     if (res.status === 401 && authToken) onUnauthorized?.();
-    throw new ApiError(res.status, data?.message ?? `요청 실패 (HTTP ${res.status})`, data?.fields ?? {});
+    // Nginx answers 502–504 with an HTML page when the API behind it is down.
+    const fallback = res.status >= 502 && res.status <= 504 ? '서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요' : `요청 실패 (HTTP ${res.status})`;
+    throw new ApiError(res.status, data?.message ?? fallback, data?.fields ?? {});
   }
   return data as T;
 }
