@@ -23,10 +23,10 @@ npm run ios                                          # 터미널 2: iOS 시뮬�
 
 저장소 소유 계정: [AllaboutZENA](https://github.com/AllaboutZENA).
 
-| 이름 | GitHub | 담당 역할 (중간 발표 기준) |
-| --- | --- | --- |
-| 박초원 (대표) | [AllaboutZENA](https://github.com/AllaboutZENA) | 기획·요구사항, 화면·데이터 설계, API·DB, 앱 화면, AWS 서버, 테스트·문서 |
-| 서민호 | [min2030](https://github.com/min2030) | — |
+| 이름 | GitHub | 담당 | 사용 기술 |
+| --- | --- | --- | --- |
+| 박초원 (대표) | [AllaboutZENA](https://github.com/AllaboutZENA) | Mobile | React Native, Expo, AWS EC2 |
+| 서민호 | [min2030](https://github.com/min2030) | Backend | Node.js, PostgreSQL, AWS EC2 |
 
 학번·개인 연락처·로그인 정보는 저장소에 적지 않습니다. 코드·테스트·문서 작성에는 Claude Code(AI)의 보조를 받았고, 모든 변경은 PR과 자동 테스트로 확인했습니다.
 
