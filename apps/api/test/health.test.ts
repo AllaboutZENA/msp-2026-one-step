@@ -39,6 +39,20 @@ describe('GET /health/db', () => {
   });
 });
 
+describe('unexpected errors', () => {
+  it('return a Korean 500 message without internals', async () => {
+    const db = {
+      query: async () => {
+        throw new Error('connect ECONNREFUSED 127.0.0.1:5432');
+      },
+    } as unknown as Queryable;
+    const res = await request(createApp({ db })).get('/assignments').set('Authorization', `Bearer ${'a'.repeat(43)}`);
+    expect(res.status).toBe(500);
+    expect(res.body.message).toContain('잠시 후 다시 시도');
+    expect(JSON.stringify(res.body)).not.toContain('ECONNREFUSED');
+  });
+});
+
 describe('unknown routes', () => {
   it('return JSON 404', async () => {
     const res = await request(createApp()).get('/nope');
