@@ -1,0 +1,15 @@
+# Subflow: create one assignment from the home screen. Needs COURSE and TITLE.
+appId: host.exp.Exponent
+---
+- tapOn: "+ 과제 등록"
+- tapOn:
+    id: "course-input"
+- inputText: ${COURSE}
+- tapOn:
+    id: "title-input"
+- inputText: ${TITLE}
+- tapOn: "마감 일시"
+- tapOn: "저장"
+- extendedWaitUntil:
+    visible: ".*${TITLE}.*"
+    timeout: 15000

@@ -1,0 +1,17 @@
+# T14 part 1: fresh account, open the new-assignment form and fill it in.
+appId: host.exp.Exponent
+env:
+  METRO_URL: exp://127.0.0.1:8081
+---
+- runFlow: ../common/fresh-account.yaml
+- tapOn: "+ 과제 등록"
+- tapOn:
+    id: "course-input"
+- inputText: "운영체제"
+- tapOn:
+    id: "title-input"
+- inputText: "T14 저장 실패 후 재시도"
+- tapOn:
+    id: "memo-input"
+- inputText: "서버 중단 중 입력"
+- tapOn: "마감 일시"

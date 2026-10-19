@@ -1,0 +1,109 @@
+# 마감한칸 core flow on the iOS simulator via Expo Go (Maestro).
+# Prereqs: API running at EXPO_PUBLIC_API_BASE_URL, Metro on :8081.
+# Run: maestro test apps/mobile/e2e/core-flow.yaml
+# Creates a fresh synthetic account (e2e-<timestamp>@example.com) each run; never real data.
+appId: host.exp.Exponent
+env:
+  METRO_URL: exp://127.0.0.1:8081
+---
+- stopApp
+- openLink: ${METRO_URL}
+- extendedWaitUntil:
+    visible: "로그인|설정"
+    timeout: 60000
+# Start signed out: a previous run may have left a session.
+- runFlow:
+    when:
+      visible: "설정"
+    commands:
+      - tapOn: "설정"
+      - tapOn: "로그아웃"
+      - extendedWaitUntil:
+          visible: "회원가입"
+          timeout: 15000
+
+# Sign up (R08)
+- tapOn: "회원가입"
+- tapOn:
+    id: "email-input"
+- inputText: ${'e2e-' + Date.now() + '@example.com'}
+- tapOn:
+    id: "password-input"
+- inputText: "e2e-password-1"
+# Dismiss the keyboard first: with a notice banner shown it can cover the button.
+- tapOn: "비밀번호"
+- tapOn: "가입하고 시작하기"
+# iOS may offer to save the password; dismiss it if shown.
+- tapOn:
+    text: "지금 안 함|Not Now"
+    optional: true
+- extendedWaitUntil:
+    visible: "남은 과제가 없어요"
+    timeout: 15000
+- takeScreenshot: e2e/screenshots/01-home-empty
+
+# Required-field validation (T01)
+- tapOn: "+ 과제 등록"
+- tapOn: "저장"
+- assertVisible: "과목명을 입력해 주세요"
+- assertVisible: "제목을 입력해 주세요"
+- takeScreenshot: e2e/screenshots/02-validation
+
+# Create (R01)
+- tapOn:
+    id: "course-input"
+- inputText: "모바일 SW"
+- tapOn:
+    id: "title-input"
+- inputText: "E2E 주간 보고서"
+- tapOn:
+    id: "memo-input"
+- inputText: "Maestro 자동 테스트로 등록"
+- assertNotVisible: "과목명을 입력해 주세요"
+# Tapping a static label dismisses the keyboard (multiline memo has no return-to-dismiss).
+- tapOn: "마감 일시"
+- takeScreenshot: e2e/screenshots/03-new-filled
+- tapOn: "저장"
+- extendedWaitUntil:
+    visible: "\\+ 과제 등록"
+    timeout: 15000
+- assertVisible: ".*E2E 주간 보고서.*"
+- assertNotVisible: "남은 과제가 없어요"
+- takeScreenshot: e2e/screenshots/04-home-list
+
+# Restart the app: still signed in and the server data comes back (T02)
+- stopApp
+- openLink: ${METRO_URL}
+- extendedWaitUntil:
+    visible: ".*E2E 주간 보고서.*"
+    timeout: 60000
+
+# Detail + submit / undo (T08)
+- tapOn: ".*E2E 주간 보고서.*"
+- extendedWaitUntil:
+    visible: "제출 완료로 표시"
+    timeout: 15000
+- assertVisible: "Maestro 자동 테스트로 등록"
+- takeScreenshot: e2e/screenshots/05-detail
+- scrollUntilVisible:
+    element: "제출 완료로 표시"
+- tapOn: "제출 완료로 표시"
+- extendedWaitUntil:
+    visible: "제출 완료 되돌리기"
+    timeout: 15000
+- tapOn: "뒤로"
+- assertVisible: "남은 과제가 없어요"
+- tapOn: "제출 완료"
+- assertVisible: ".*E2E 주간 보고서.*"
+- takeScreenshot: e2e/screenshots/06-submitted-tab
+
+# Settings + logout
+- tapOn: "설정"
+- extendedWaitUntil:
+    visible: "응답 정상"
+    timeout: 15000
+- takeScreenshot: e2e/screenshots/07-settings
+- tapOn: "로그아웃"
+- extendedWaitUntil:
+    visible: "가입하고 시작하기|로그인"
+    timeout: 15000
