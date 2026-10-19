@@ -101,6 +101,8 @@ export default function LoginScreen() {
             secureTextEntry
             textContentType={mode === 'login' ? 'password' : 'newPassword'}
             placeholder={mode === 'signup' ? '8자 이상' : undefined}
+            returnKeyType="go"
+            onSubmitEditing={submit}
             error={fields.password}
           />
           {mode === 'signup' && (
@@ -108,7 +110,7 @@ export default function LoginScreen() {
           )}
 
           <Button label={mode === 'login' ? '로그인' : '가입하고 시작하기'} onPress={submit} busy={busy} />
-          <Text style={styles.hint}>HTTPS 연결 전까지는 실제로 쓰는 비밀번호 대신 테스트용 비밀번호를 사용해 주세요.</Text>
+          <Text style={styles.hint}>개발·테스트 기간에는 실제로 쓰는 비밀번호 대신 테스트용 비밀번호를 사용해 주세요.</Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
