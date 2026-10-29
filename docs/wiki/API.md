@@ -1,6 +1,6 @@
-# API 명세 — v0 (2026-10-15)
+# API 명세 — v1 (2026-10-29, 세부 작업 추가)
 
-기준 주소: 로컬 `http://localhost:3000`, EC2는 HTTPS 구성 전까지 SSH 터널 `http://localhost:3001`.
+기준 주소: 로컬 `http://localhost:3000`, EC2는 HTTPS 주소(공개 저장소에는 적지 않음).
 모든 요청·응답은 JSON입니다. 날짜는 시간대가 포함된 ISO 8601(UTC 저장)이며 앱이 기기 현지 시간으로 표시합니다.
 
 ## 인증
@@ -46,6 +46,24 @@
 - `submitted: true`는 처음 제출 시각을 유지하고, `false`는 제출 기록을 지웁니다. 진행률 100%가 되어도 자동 제출되지 않습니다.
 - 지연 여부는 앱이 `submittedAt == null && dueAt < 현재 시각`으로 표시합니다.
 
+## 세부 작업 (로그인 필요)
+
+과제가 로그인한 사용자의 것이어야 합니다. 아니면 과제·세부 작업 모두 404입니다. 변경 응답에는 다시 계산한 과제 진행률이 들어 있어 앱이 바로 반영합니다.
+
+| 메서드 | 경로 | 본문 | 성공 |
+| --- | --- | --- | --- |
+| POST | `/assignments/:id/subtasks` | `{title}` (1–200자) | 201 `{subtask, progress}`, 맨 뒤에 추가 |
+| PATCH | `/assignments/:id/subtasks/:subtaskId` | `{title?, isDone?}` | 200 `{subtask, progress}` |
+| DELETE | `/assignments/:id/subtasks/:subtaskId` | — | 200 `{progress}` |
+
+```json
+{ "subtask": { "id": "uuid", "title": "자료 조사", "isDone": true, "sortOrder": 0 },
+  "progress": { "done": 1, "total": 3, "percent": 33 } }
+```
+
+- 과제당 최대 100개(초과 시 400). 진행률 = 완료 ÷ 전체 × 100 반올림, 0개면 0%.
+- 진행률이 100%가 되어도 `submittedAt`은 바뀌지 않습니다.
+
 ## 오류 형식
 
 ```json
@@ -61,4 +79,4 @@
 | 500 | 예상하지 못한 서버 오류(DB 중단 등). 내부 정보 없이 "서버에 일시적인 문제가 생겼어요…" 안내 |
 | 503 | 서버에 DB 미설정 |
 
-세부 작업 API(`/assignments/:id/subtasks`)는 W09에 추가합니다.
+
