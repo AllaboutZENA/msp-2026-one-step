@@ -5,6 +5,7 @@ import { requireAuth } from '../auth/middleware.js';
 import type { Queryable } from '../db.js';
 import { calculateProgress } from '../domain/progress.js';
 import { asBody, HttpError, UUID_RE, Validator } from '../http.js';
+import { subtasksRouter, toSubtask } from './subtasks.js';
 
 interface AssignmentRow {
   id: string;
@@ -54,6 +55,7 @@ function assignmentId(raw: string): string {
 export function assignmentsRouter(db: Queryable) {
   const r = Router();
   r.use(requireAuth(db));
+  r.use('/:id/subtasks', subtasksRouter(db));
 
   async function findOwned(userId: string, id: string): Promise<AssignmentRow> {
     const { rows } = await db.query<AssignmentRow>(
@@ -99,7 +101,7 @@ export function assignmentsRouter(db: Queryable) {
     res.json({
       assignment: {
         ...toAssignment(row),
-        subtasks: subtasks.map((s) => ({ id: s.id, title: s.title, isDone: s.is_done, sortOrder: s.sort_order })),
+        subtasks: subtasks.map(toSubtask),
       },
     });
   });

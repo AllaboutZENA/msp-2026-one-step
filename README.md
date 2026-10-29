@@ -2,7 +2,7 @@
 
 대학생이 과제를 작은 할 일로 나누고 마감과 진행률을 확인하는 개인용 모바일 앱입니다.
 
-> 상태: **중간 발표 안정본 (2026-10, [`v0.1.0-midterm`](https://github.com/AllaboutZENA/msp-2026-one-step/releases/tag/v0.1.0-midterm))**. 회원가입·로그인, 과제 등록·조회·수정·삭제, 마감순 목록·지연 표시, 과목 필터, 제출 완료가 iOS 앱 ↔ EC2 HTTPS API ↔ PostgreSQL에서 동작합니다. 세부 작업·진행률 화면(9주차)과 로컬 알림(10주차)은 진행 전입니다.
+> 상태: **중간 발표 안정본 (2026-10, [`v0.1.0-midterm`](https://github.com/AllaboutZENA/msp-2026-one-step/releases/tag/v0.1.0-midterm))**. 회원가입·로그인, 과제 등록·조회·수정·삭제, 마감순 목록·지연 표시, 과목 필터, 제출 완료가 iOS 앱 ↔ EC2 HTTPS API ↔ PostgreSQL에서 동작합니다. 2026-10-29: 세부 작업 체크리스트와 진행률을 추가했습니다. 로컬 알림(10주차)은 진행 전입니다.
 
 ## 빠른 실행
 
@@ -41,7 +41,7 @@ npm run ios                                          # 터미널 2: iOS 시뮬�
 | 회원가입·로그인·로그아웃 (세션 토큰, 본인 과제만 접근) | 구현 |
 | 과제 등록·조회·수정·삭제와 서버(PostgreSQL) 저장, 저장 실패 시 입력 유지 | 구현 |
 | 마감순 목록, D-day·지연 표시, 과목 필터, 제출 완료·되돌리기 | 구현 |
-| 세부 작업 체크와 진행률 화면 (진행률 계산은 API에 구현) | 9주차 |
+| 세부 작업 추가·완료·이름 변경·삭제와 진행률 (즉시 재계산, 100%여도 자동 제출 안 함) | 구현 |
 | 마감 하루 전 로컬 알림 | 10주차 |
 
 알림은 휴대폰의 로컬 알림이며 서버 푸시와 구분합니다. 실제 기기 실험 후 확정합니다. 공용 서버 DB를 쓰므로 최소 사용자 인증과 소유자별 접근 검사를 포함합니다(인증 방식은 3–4주차 결정). 학교 LMS 연동, AI 자동 계획, 채팅, 결제, 공동편집, 다중 기기 실시간 동기화, 앱스토어 출시는 이번 범위에 포함하지 않습니다.
@@ -89,6 +89,7 @@ npm --prefix apps/mobile run typecheck && npm --prefix apps/mobile run lint
 # 6) 앱 E2E (Maestro, iOS 시뮬레이터 + Metro 실행 중)
 maestro test apps/mobile/e2e/core-flow.yaml      # 가입·등록·재실행·제출
 maestro test apps/mobile/e2e/manage-flow.yaml    # 과목 필터·수정·삭제
+maestro test apps/mobile/e2e/subtasks-flow.yaml  # 세부 작업·진행률
 bash apps/mobile/e2e/run-save-failure.sh         # 로컬 DB를 잠시 멈추고 저장 실패·재시도 확인
 ```
 

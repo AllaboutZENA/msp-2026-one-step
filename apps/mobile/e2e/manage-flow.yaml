@@ -66,9 +66,9 @@ env:
 # Delete: cancel keeps it, confirm removes it (T04 UI)
 - tapOn: ".*W07 삭제할 실습.*"
 - extendedWaitUntil:
-    visible: "삭제"
+    visible: "과제 삭제"
     timeout: 15000
-- tapOn: "삭제"
+- tapOn: "과제 삭제"
 - extendedWaitUntil:
     visible: "과제를 삭제할까요?"
     timeout: 5000
@@ -76,13 +76,12 @@ env:
 - tapOn: "취소"
 - assertNotVisible: "과제를 삭제할까요?"
 - assertVisible: "W07 삭제할 실습"
-- tapOn: "삭제"
+- tapOn: "과제 삭제"
 - extendedWaitUntil:
     visible: "과제를 삭제할까요?"
     timeout: 5000
-- tapOn:
-    text: "삭제"
-    below: "과제를 삭제할까요?"
+# The detail button reads "과제 삭제", so "삭제" is only the dialog's button.
+- tapOn: "삭제"
 - extendedWaitUntil:
     visible: "\\+ 과제 등록"
     timeout: 15000

@@ -1,8 +1,9 @@
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { Banner, Button, ProgressBar } from '../../../components/ui';
+import { SubtaskList } from '../../../components/SubtaskList';
+import { Banner, Button } from '../../../components/ui';
 import { api, ApiError } from '../../../lib/api';
 import { dueLabel, formatDue, isOverdue } from '../../../lib/format';
 import { colors } from '../../../lib/theme';
@@ -69,60 +70,51 @@ export default function AssignmentDetailScreen() {
 
   const overdue = isOverdue(item);
   return (
-    <ScrollView contentContainerStyle={styles.content}>
-      <Stack.Screen options={{ title: item.courseName }} />
-      {!!error && <Banner>{error}</Banner>}
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={100} style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <Stack.Screen options={{ title: item.courseName }} />
+        {!!error && <Banner>{error}</Banner>}
 
-      <View style={styles.card}>
-        <Text style={styles.course}>{item.courseName}</Text>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={[styles.due, overdue && { color: colors.danger }]}>
-          {formatDue(item.dueAt)} 마감 · {item.submittedAt ? '제출 완료' : overdue ? `지연 (${dueLabel(item.dueAt)})` : dueLabel(item.dueAt)}
-        </Text>
-        {!!item.memo && <Text style={styles.memo}>{item.memo}</Text>}
-      </View>
-
-      <View style={styles.card}>
-        <View style={styles.rowBetween}>
-          <Text style={styles.section}>세부 작업</Text>
-          <Text style={styles.muted}>
-            {item.progress.percent}% · {item.progress.done}/{item.progress.total}
+        <View style={styles.card}>
+          <Text style={styles.course}>{item.courseName}</Text>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={[styles.due, overdue && { color: colors.danger }]}>
+            {formatDue(item.dueAt)} 마감 · {item.submittedAt ? '제출 완료' : overdue ? `지연 (${dueLabel(item.dueAt)})` : dueLabel(item.dueAt)}
           </Text>
+          {!!item.memo && <Text style={styles.memo}>{item.memo}</Text>}
         </View>
-        <ProgressBar percent={item.progress.percent} />
-        {item.subtasks.length === 0 ? (
-          <Text style={styles.muted}>세부 작업이 없어요. 추가·체크 기능은 9주차에 연결됩니다.</Text>
-        ) : (
-          item.subtasks.map((s) => (
-            <Text key={s.id} style={[styles.subtask, s.isDone && styles.subtaskDone]}>
-              {s.isDone ? '☑' : '☐'} {s.title}
-            </Text>
-          ))
-        )}
-      </View>
 
-      <Button
-        label={item.submittedAt ? '제출 완료 되돌리기' : '제출 완료로 표시'}
-        variant={item.submittedAt ? 'secondary' : 'primary'}
-        onPress={toggleSubmitted}
-        busy={busy}
-      />
-      <Text style={styles.muted}>진행률이 100%여도 자동으로 제출 완료되지 않아요. 실제로 제출한 뒤 눌러 주세요.</Text>
+        <SubtaskList
+          assignmentId={item.id}
+          subtasks={item.subtasks}
+          progress={item.progress}
+          submitted={!!item.submittedAt}
+          onChange={(subtasks, progress) => setItem((prev) => (prev ? { ...prev, subtasks, progress } : prev))}
+        />
 
-      <View style={styles.actions}>
-        <View style={{ flex: 1 }}>
-          <Button
-            label="수정"
-            variant="secondary"
-            onPress={() => router.push({ pathname: '/edit/[id]', params: { id: item.id } })}
-            disabled={busy}
-          />
+        <Button
+          label={item.submittedAt ? '제출 완료 되돌리기' : '제출 완료로 표시'}
+          variant={item.submittedAt ? 'secondary' : 'primary'}
+          onPress={toggleSubmitted}
+          busy={busy}
+        />
+        <Text style={styles.muted}>진행률이 100%여도 자동으로 제출 완료되지 않아요. 실제로 제출한 뒤 눌러 주세요.</Text>
+
+        <View style={styles.actions}>
+          <View style={{ flex: 1 }}>
+            <Button
+              label="수정"
+              variant="secondary"
+              onPress={() => router.push({ pathname: '/edit/[id]', params: { id: item.id } })}
+              disabled={busy}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button label="과제 삭제" variant="danger" onPress={confirmDelete} disabled={busy} />
+          </View>
         </View>
-        <View style={{ flex: 1 }}>
-          <Button label="삭제" variant="danger" onPress={confirmDelete} disabled={busy} />
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -133,10 +125,6 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: '800', color: colors.ink },
   due: { fontSize: 14, color: colors.ink2 },
   memo: { fontSize: 14, color: colors.ink2, marginTop: 4, lineHeight: 20 },
-  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  section: { fontSize: 16, fontWeight: '700', color: colors.ink },
-  subtask: { fontSize: 15, color: colors.ink },
-  subtaskDone: { color: colors.ink3, textDecorationLine: 'line-through' },
   muted: { fontSize: 13, color: colors.ink3 },
   actions: { flexDirection: 'row', gap: 10, marginTop: 12 },
 });

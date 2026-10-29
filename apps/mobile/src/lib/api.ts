@@ -1,7 +1,7 @@
 // Small fetch wrapper for the 마감한칸 API: base URL, bearer token, timeout,
 // and one error type the screens can show directly.
 import { API_BASE_URL } from './health';
-import type { Assignment, AssignmentDetail, AssignmentInput, User } from './types';
+import type { Assignment, AssignmentDetail, AssignmentInput, Progress, Subtask, User } from './types';
 
 export class ApiError extends Error {
   constructor(
@@ -80,4 +80,18 @@ export const api = {
   updateAssignment: (id: string, patch: Partial<AssignmentInput> & { submitted?: boolean }) =>
     request<{ assignment: Assignment }>('PATCH', `/assignments/${encodeURIComponent(id)}`, patch).then((r) => r.assignment),
   deleteAssignment: (id: string) => request<void>('DELETE', `/assignments/${encodeURIComponent(id)}`),
+
+  addSubtask: (assignmentId: string, title: string) =>
+    request<{ subtask: Subtask; progress: Progress }>('POST', `/assignments/${encodeURIComponent(assignmentId)}/subtasks`, { title }),
+  updateSubtask: (assignmentId: string, subtaskId: string, patch: { title?: string; isDone?: boolean }) =>
+    request<{ subtask: Subtask; progress: Progress }>(
+      'PATCH',
+      `/assignments/${encodeURIComponent(assignmentId)}/subtasks/${encodeURIComponent(subtaskId)}`,
+      patch,
+    ),
+  deleteSubtask: (assignmentId: string, subtaskId: string) =>
+    request<{ progress: Progress }>(
+      'DELETE',
+      `/assignments/${encodeURIComponent(assignmentId)}/subtasks/${encodeURIComponent(subtaskId)}`,
+    ),
 };
