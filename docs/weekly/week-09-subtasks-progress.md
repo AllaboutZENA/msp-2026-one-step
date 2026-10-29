@@ -26,6 +26,8 @@
 
 - EC2 배포 전에 SSH가 막혔다. 개발자 맥의 공인 IP가 바뀌어 보안 그룹의 SSH 허용 주소(/32)와 달랐기 때문이다. AWS에 다시 로그인해 새 IP를 허용하고 이전 규칙을 지운 뒤 배포했다. 배포 후 HTTPS 서버에서 E2E 3종이 통과했다.
 
+- 실제 iPhone에서 열자 "Project is incompatible with this version of Expo Go"가 나왔다. App Store의 Expo Go는 최신 SDK(58, 10월 말 출시)만 지원하고, iOS에서는 이전 버전 Expo Go를 설치할 수 없다. 프로젝트를 SDK 58(React Native 0.88, React 19.3)로 올렸다. 버전이 섞인 `node_modules` 때문에 의존성 충돌이 나서 깨끗하게 다시 설치했다. 시뮬레이터도 Expo Go 58.0.7로 바꾼 뒤 E2E를 다시 통과했다.
+
 ## 아직 못 한 것
 
 - 실제 휴대폰 확인(#14), 학생 인터뷰(#3)
