@@ -50,7 +50,7 @@ npm run ios                                          # 터미널 2: iOS 시뮬�
 
 | 구분 | 기술 | 비고 |
 | --- | --- | --- |
-| 모바일 | React Native · Expo SDK 57 · TypeScript | `apps/mobile`, 개발은 맥북 iOS 시뮬레이터 + Expo Go |
+| 모바일 | React Native 0.88 · Expo SDK 58 · TypeScript | `apps/mobile`, 개발은 맥북 iOS 시뮬레이터 + Expo Go |
 | API | Node.js 24 LTS · Express 5 · TypeScript | `apps/api`, 내부 `127.0.0.1:3000` |
 | DB | PostgreSQL 18 | 서버는 EC2의 PostgreSQL, 로컬 개발은 Homebrew PostgreSQL 18 |
 | 서버 | AWS EC2 t3.micro 1대 (시드니) · systemd · Nginx HTTPS (Let's Encrypt) | [Server-Plan](docs/wiki/Server-Plan.md) · [구성 기록](docs/infra/ec2-dev-server.md) |
