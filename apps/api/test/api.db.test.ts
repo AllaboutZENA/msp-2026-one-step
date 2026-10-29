@@ -206,4 +206,97 @@ describe.skipIf(!url)('API with PostgreSQL', () => {
       expect(bad.status).toBe(400);
     });
   });
+  describe('subtasks (R03, R04)', () => {
+    const sub = (id: string) => `/assignments/${id}/subtasks`;
+
+    async function assignment(token: string) {
+      const { body } = await create(token, { courseName: 'OS', title: '보고서', dueAt: '2026-11-05T14:59:00Z' });
+      return body.assignment.id as string;
+    }
+
+    it('adds, completes and deletes subtasks with progress recalculated each time (T05, T06)', async () => {
+      const token = await signup('s1@example.com');
+      const id = await assignment(token);
+      expect((await request(app).get(`/assignments/${id}`).set(auth(token))).body.assignment.progress.percent).toBe(0);
+
+      const ids: string[] = [];
+      for (const title of ['자료 조사', '초안', '제출']) {
+        const res = await request(app).post(sub(id)).set(auth(token)).send({ title });
+        expect(res.status).toBe(201);
+        ids.push(res.body.subtask.id);
+      }
+      const third = await request(app).get(`/assignments/${id}`).set(auth(token));
+      expect(third.body.assignment.subtasks.map((s: { title: string; sortOrder: number }) => [s.title, s.sortOrder])).toEqual([
+        ['자료 조사', 0],
+        ['초안', 1],
+        ['제출', 2],
+      ]);
+
+      const one = await request(app).patch(`${sub(id)}/${ids[0]}`).set(auth(token)).send({ isDone: true });
+      expect(one.body).toMatchObject({ subtask: { isDone: true }, progress: { done: 1, total: 3, percent: 33 } });
+
+      for (const sid of ids.slice(1)) await request(app).patch(`${sub(id)}/${sid}`).set(auth(token)).send({ isDone: true });
+      const all = await request(app).get(`/assignments/${id}`).set(auth(token));
+      expect(all.body.assignment.progress.percent).toBe(100);
+      expect(all.body.assignment.submittedAt).toBeNull(); // 100% is not "submitted" (T08)
+
+      const undo = await request(app).patch(`${sub(id)}/${ids[2]}`).set(auth(token)).send({ isDone: false });
+      expect(undo.body.progress).toEqual({ done: 2, total: 3, percent: 67 });
+
+      const del = await request(app).delete(`${sub(id)}/${ids[2]}`).set(auth(token));
+      expect(del.status).toBe(200);
+      expect(del.body.progress).toEqual({ done: 2, total: 2, percent: 100 });
+
+      const list = await request(app).get('/assignments').set(auth(token));
+      expect(list.body.assignments[0].progress).toEqual({ done: 2, total: 2, percent: 100 });
+    });
+
+    it('renames a subtask and validates input', async () => {
+      const token = await signup('s2@example.com');
+      const id = await assignment(token);
+      const { body } = await request(app).post(sub(id)).set(auth(token)).send({ title: '  초안  ' });
+      expect(body.subtask.title).toBe('초안');
+
+      const renamed = await request(app).patch(`${sub(id)}/${body.subtask.id}`).set(auth(token)).send({ title: '초안 작성' });
+      expect(renamed.body.subtask).toMatchObject({ title: '초안 작성', isDone: false });
+
+      expect((await request(app).post(sub(id)).set(auth(token)).send({ title: '   ' })).body.fields).toHaveProperty('title');
+      expect((await request(app).post(sub(id)).set(auth(token)).send({ title: 'x'.repeat(201) })).status).toBe(400);
+      expect((await request(app).patch(`${sub(id)}/${body.subtask.id}`).set(auth(token)).send({ isDone: 'yes' })).status).toBe(400);
+      expect((await request(app).patch(`${sub(id)}/${body.subtask.id}`).set(auth(token)).send({})).status).toBe(400);
+    });
+
+    it('caps subtasks per assignment', async () => {
+      const token = await signup('s3@example.com');
+      const id = await assignment(token);
+      await pool.query(
+        `INSERT INTO subtasks (assignment_id, title, sort_order) SELECT $1, 'n' || g, g FROM generate_series(1, 100) g`,
+        [id],
+      );
+      const res = await request(app).post(sub(id)).set(auth(token)).send({ title: '101번째' });
+      expect(res.status).toBe(400);
+      expect(res.body.message).toContain('100개');
+    });
+
+    it("hides another user's assignment and subtasks behind 404 (T13)", async () => {
+      const owner = await signup('s4@example.com');
+      const other = await signup('s5@example.com');
+      const id = await assignment(owner);
+      const { body } = await request(app).post(sub(id)).set(auth(owner)).send({ title: '내 작업' });
+      const sid = body.subtask.id;
+      const otherId = await assignment(other);
+
+      expect((await request(app).post(sub(id)).set(auth(other)).send({ title: '침입' })).status).toBe(404);
+      expect((await request(app).patch(`${sub(id)}/${sid}`).set(auth(other)).send({ isDone: true })).status).toBe(404);
+      expect((await request(app).delete(`${sub(id)}/${sid}`).set(auth(other))).status).toBe(404);
+      // Own assignment id + someone else's subtask id is also 404.
+      expect((await request(app).patch(`${sub(otherId)}/${sid}`).set(auth(other)).send({ isDone: true })).status).toBe(404);
+      expect((await request(app).delete(`${sub(otherId)}/${sid}`).set(auth(other))).status).toBe(404);
+      expect((await request(app).patch(`${sub(id)}/not-a-uuid`).set(auth(owner)).send({ isDone: true })).status).toBe(404);
+
+      const { rows } = await pool.query('SELECT title, is_done FROM subtasks WHERE id = $1', [sid]);
+      expect(rows).toEqual([{ title: '내 작업', is_done: false }]);
+      expect((await request(app).post(sub(id)).send({ title: '토큰 없음' })).status).toBe(401);
+    });
+  });
 });
