@@ -97,6 +97,8 @@ bash apps/mobile/e2e/run-save-failure.sh         # 로컬 DB를 잠시 멈추고
 
 EC2 개발 서버 사용법(SSH 터널, 배포 명령)은 [docs/infra/ec2-dev-server.md](docs/infra/ec2-dev-server.md)에 있습니다.
 
+실제 iPhone: App Store의 Expo Go는 최신 SDK만 지원합니다(현재 SDK 58). 휴대폰 Expo Go가 Expo 계정으로 로그인돼 있다면 맥에서도 `npx expo login`으로 같은 계정에 로그인한 뒤 `npx expo start`를 실행하고, 카메라로 QR을 찍어 엽니다.
+
 iOS 시뮬레이터는 맥의 네트워크를 공유하므로 `http://localhost:3000`으로 로컬 API에 접근합니다. 실제 휴대폰에서 `localhost`는 휴대폰 자신이므로 맥의 LAN IP나 EC2 HTTPS 주소를 사용합니다. `EXPO_PUBLIC_*` 값은 앱에 포함되므로 비밀번호·키를 넣지 않습니다.
 
 ## Roadmap

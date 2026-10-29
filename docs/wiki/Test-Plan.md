@@ -39,3 +39,4 @@
 | 2026-10-29 | codex/subtasks | macOS · 로컬 PostgreSQL 18, iPhone 16 시뮬레이터 · 로컬 API | API 29개(세부 작업 추가·완료·취소·삭제 진행률, 이름 변경·검증, 과제당 100개 제한, 남의 과제·세부 작업 404). Maestro `subtasks-flow.yaml`: 3개 추가 → 33% → 100%(자동 제출 없음) → 취소 67% → 이름 변경 → 삭제 100% 2/2 → 홈 반영 → 재실행 유지. core·manage 재실행 | 통과 |
 | 2026-10-29 | develop 08dd746 (EC2 배포) | iPhone 16 시뮬레이터 → EC2 HTTPS | Maestro `subtasks-flow`·`manage-flow`·`core-flow` | 통과 · 실기기 미검증 |
 | 2026-10-29 | codex/expo-sdk-58 | iPhone 16 시뮬레이터 · Expo Go 58.0.7 → EC2 HTTPS | Expo SDK 57 → 58 업그레이드 후 `expo-doctor` 20/20, `tsc`·`expo lint`, Maestro core·subtasks·manage | 통과 · 실제 iPhone의 Expo Go(SDK 58 전용)와 버전 일치 |
+| 2026-10-29 | develop e9dec9f | **실제 iPhone** · Expo Go(SDK 58, 같은 와이파이) → EC2 HTTPS | 회원가입 → 과제 등록 → 세부 작업 2개 추가·1개 체크. 서버 DB에서 해당 시간대 계정 1·과제 1·세부 작업 2(완료 1) 생성 확인 | 통과 · 휴대폰 Expo Go와 맥 Expo CLI가 같은 Expo 계정으로 로그인돼 있어야 열림 |
