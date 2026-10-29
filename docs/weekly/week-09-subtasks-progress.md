@@ -28,9 +28,11 @@
 
 - 실제 iPhone에서 열자 "Project is incompatible with this version of Expo Go"가 나왔다. App Store의 Expo Go는 최신 SDK(58, 10월 말 출시)만 지원하고, iOS에서는 이전 버전 Expo Go를 설치할 수 없다. 프로젝트를 SDK 58(React Native 0.88, React 19.3)로 올렸다. 버전이 섞인 `node_modules` 때문에 의존성 충돌이 나서 깨끗하게 다시 설치했다. 시뮬레이터도 Expo Go 58.0.7로 바꾼 뒤 E2E를 다시 통과했다.
 
+- SDK 58로 올린 뒤 실제 iPhone에서 앱이 열렸다. 처음에는 "signed in to Expo Go as allzena, but not signed in to Expo CLI"가 나왔다. 휴대폰 Expo Go가 Expo 계정으로 로그인돼 있으면 맥의 Expo CLI도 같은 계정이어야 해서, `npx expo login` 후 개발 서버를 다시 띄웠다. 실제 iPhone → EC2 HTTPS → PostgreSQL로 가입·과제·세부 작업이 저장되는 것을 서버 DB에서 확인했다(#14).
+
 ## 아직 못 한 것
 
-- 실제 휴대폰 확인(#14), 학생 인터뷰(#3)
+- 학생 인터뷰(#3)
 - 세부 작업 순서 바꾸기(현재는 추가 순서)
 
 ## 다음 주 계획 (W10)
