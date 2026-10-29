@@ -1,0 +1,114 @@
+# W09: subtasks and progress on the detail screen (R03, R04).
+# Prereqs: API running at EXPO_PUBLIC_API_BASE_URL, Metro on :8081.
+# Run: maestro test apps/mobile/e2e/subtasks-flow.yaml
+appId: host.exp.Exponent
+env:
+  METRO_URL: exp://127.0.0.1:8081
+---
+- runFlow: common/fresh-account.yaml
+- runFlow:
+    file: common/create-assignment.yaml
+    env:
+      COURSE: "운영체제"
+      TITLE: "W09 스케줄링 보고서"
+- tapOn: ".*W09 스케줄링 보고서.*"
+- extendedWaitUntil:
+    visible: "세부 작업"
+    timeout: 15000
+- assertVisible:
+    id: "progress-text"
+    text: "0% · 0/0"
+
+# Add three subtasks; the input stays focused after each one
+- tapOn:
+    id: "subtask-input"
+- inputText: "자료 조사"
+- pressKey: Enter
+- inputText: "초안 작성"
+- pressKey: Enter
+- inputText: "최종 검토"
+- pressKey: Enter
+- tapOn: "세부 작업"
+- assertVisible: "자료 조사"
+- assertVisible: "초안 작성"
+- assertVisible: "최종 검토"
+- assertVisible:
+    id: "progress-text"
+    text: "0% · 0/3"
+- takeScreenshot: e2e/screenshots/31-subtasks-added
+
+# 1 of 3 → 33%, all → 100% without auto-submitting (T05, T08)
+- tapOn:
+    id: "subtask-check-0"
+- extendedWaitUntil:
+    visible:
+      id: "progress-text"
+      text: "33% · 1/3"
+    timeout: 10000
+- tapOn:
+    id: "subtask-check-1"
+- tapOn:
+    id: "subtask-check-2"
+- extendedWaitUntil:
+    visible:
+      id: "progress-text"
+      text: "100% · 3/3"
+    timeout: 10000
+- assertVisible: "모든 세부 작업을 마쳤어요.*"
+- assertVisible: "제출 완료로 표시"
+- takeScreenshot: e2e/screenshots/32-subtasks-done
+
+# Undo, rename and delete recalculate immediately (T06)
+- tapOn:
+    id: "subtask-check-2"
+- extendedWaitUntil:
+    visible:
+      id: "progress-text"
+      text: "67% · 2/3"
+    timeout: 10000
+- assertNotVisible: "모든 세부 작업을 마쳤어요.*"
+- tapOn: "초안 작성"
+- tapOn:
+    id: "subtask-edit-1"
+- eraseText: 10
+- inputText: "초안 작성 완료"
+- pressKey: Enter
+- extendedWaitUntil:
+    visible: "초안 작성 완료"
+    timeout: 10000
+- tapOn:
+    id: "subtask-delete-2"
+- extendedWaitUntil:
+    visible: "세부 작업을 삭제할까요?"
+    timeout: 5000
+- tapOn: "삭제"
+- extendedWaitUntil:
+    visible:
+      id: "progress-text"
+      text: "100% · 2/2"
+    timeout: 10000
+- assertNotVisible: "최종 검토"
+- takeScreenshot: e2e/screenshots/33-subtasks-edited
+
+# Home shows the same progress, and it survives an app restart
+- tapOn: "뒤로"
+- assertVisible: ".*진행률 100%.*"
+- stopApp
+- openLink: ${METRO_URL}
+- extendedWaitUntil:
+    visible: ".*W09 스케줄링 보고서.*"
+    timeout: 60000
+- tapOn: ".*W09 스케줄링 보고서.*"
+- extendedWaitUntil:
+    visible: "초안 작성 완료"
+    timeout: 15000
+- assertVisible:
+    id: "progress-text"
+    text: "100% · 2/2"
+
+- tapOn: "뒤로"
+- tapOn: "설정"
+- tapOn: "로그아웃"
+- extendedWaitUntil:
+    visible: "가입하고 시작하기|로그인"
+    timeout: 15000
