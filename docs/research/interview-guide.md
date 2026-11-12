@@ -2,6 +2,8 @@
 
 관련 Issue: [#3 학생의 과제 관리 불편과 MVP 요구사항 확인](https://github.com/AllaboutZENA/msp-2026-one-step/issues/3) · 요구사항 [Requirements](../wiki/Requirements.md) · 기록표 [observation-sheet.md](observation-sheet.md) · 종합 [synthesis.md](synthesis.md)
 
+시간이 부족하면 1인 10분짜리 [간소화 버전](lite-guide.md)(A3 + 필수 과제 B1–B4 + C4·C5)으로 진행합니다.
+
 한 명당 약 25분이 걸립니다. 순서는 **A 인터뷰(8분) → B 앱 사용 과제(12분) → C 사후 질문(5분)**입니다. 결과는 실제로 진행한 내용만 기록합니다. 응답이나 수치를 지어내지 않습니다.
 
 ## 목적
