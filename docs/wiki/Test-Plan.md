@@ -42,3 +42,4 @@
 | 2026-10-29 | develop e9dec9f | **실제 iPhone** · Expo Go(SDK 58, 같은 와이파이) → EC2 HTTPS | 회원가입 → 과제 등록 → 세부 작업 2개 추가·1개 체크. 서버 DB에서 해당 시간대 계정 1·과제 1·세부 작업 2(완료 1) 생성 확인 | 통과 · 휴대폰 Expo Go와 맥 Expo CLI가 같은 Expo 계정으로 로그인돼 있어야 열림 |
 | 2026-11-12 | codex/due-reminders | macOS · iPhone 16 시뮬레이터 · Expo Go 58.0.7 → EC2 HTTPS | 앱 단위 테스트 6개(`reminderPlan`: 하루 전 계산·정렬, 지난 시각·경계 제외, 제출 제외, 변경분만 재예약). Maestro `reminders-deny.yaml`(Expo Go 재설치 후 거부 → 안내, 등록 정상), `reminders-flow.yaml`(허용 → 예약 1개 → 제출 0 → 되돌리기 1 → 끄기/켜기 → 삭제 0). core·manage·subtasks 회귀 | 통과 · 알림 실제 수신은 실기기 확인 예정 |
 | 2026-11-12 | develop (PR #37) | **실제 iPhone** (iOS 26) · Expo Go SDK 58 → EC2 HTTPS | 홈 "알림 켜기" → 허용 → 설정 "테스트 알림 보내기" → 홈 화면으로 나감 | 통과: 5초 뒤 알림 수신 |
+| 2026-11-12 | develop (PR #39) | **실제 iPhone** (iOS 26) · Expo Go SDK 58 | 홈·상세·설정에서 상단 제목줄과 내용이 겹치지 않음(`headerTransparent: false`) | 통과 (사용자 확인) |
