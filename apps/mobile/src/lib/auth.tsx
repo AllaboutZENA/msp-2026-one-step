@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { api, ApiError, setAuthToken, setUnauthorizedHandler } from './api';
+import { cancelAllReminders } from './reminders';
 import type { User } from './types';
 
 const TOKEN_KEY = 'magam-hankan.session-token';
@@ -28,6 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clear = useCallback(async (notice?: string) => {
     setAuthToken(null);
     await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
+    // Reminders belong to the account that scheduled them.
+    await cancelAllReminders().catch(() => {});
     setState({ status: 'signedOut', notice });
   }, []);
 

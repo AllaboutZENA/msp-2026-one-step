@@ -1,4 +1,6 @@
-import { Redirect, Stack } from 'expo-router';
+import * as Notifications from 'expo-notifications';
+import { Redirect, router, Stack } from 'expo-router';
+import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import { useAuth } from '../../lib/auth';
@@ -6,6 +8,16 @@ import { colors } from '../../lib/theme';
 
 export default function AppLayout() {
   const { state } = useAuth();
+  const response = Notifications.useLastNotificationResponse();
+  const signedIn = state.status === 'signedIn';
+
+  // Tapping a deadline reminder opens that assignment.
+  useEffect(() => {
+    const id = response?.notification.request.content.data?.assignmentId;
+    if (!signedIn || typeof id !== 'string') return;
+    Notifications.clearLastNotificationResponse();
+    router.push({ pathname: '/assignment/[id]', params: { id } });
+  }, [response, signedIn]);
   if (state.status === 'loading') {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg }}>

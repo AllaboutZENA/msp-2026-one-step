@@ -5,6 +5,7 @@ import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View
 import { Banner, Button, ProgressBar } from '../../components/ui';
 import { api, ApiError } from '../../lib/api';
 import { dueLabel, formatDue, isOverdue } from '../../lib/format';
+import { requestPermission, syncReminders } from '../../lib/reminders';
 import { colors } from '../../lib/theme';
 import type { Assignment } from '../../lib/types';
 
@@ -24,14 +25,35 @@ export default function HomeScreen() {
   }, [items, course]);
   const visible = useMemo(() => (course ? (items ?? []).filter((a) => a.courseName === course) : (items ?? [])), [items, course]);
 
-  const load = useCallback(async (which: Tab) => {
+  // Reminders follow the open list. Failing to schedule never hides saved data (T12).
+  const [reminderNote, setReminderNote] = useState<'ask' | 'failed' | null>(null);
+  const syncFrom = useCallback(async (open: Assignment[]) => {
     try {
-      setItems(await api.listAssignments(which));
-      setError(null);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : '목록을 불러오지 못했어요');
+      const r = await syncReminders(open);
+      setReminderNote(r.state === 'undetermined' && open.length > 0 ? 'ask' : null);
+    } catch {
+      setReminderNote('failed');
     }
   }, []);
+
+  const load = useCallback(
+    async (which: Tab) => {
+      try {
+        const list = await api.listAssignments(which);
+        setItems(list);
+        setError(null);
+        (which === 'open' ? Promise.resolve(list) : api.listAssignments('open')).then(syncFrom, () => {});
+      } catch (err) {
+        setError(err instanceof ApiError ? err.message : '목록을 불러오지 못했어요');
+      }
+    },
+    [syncFrom],
+  );
+
+  async function turnOnReminders() {
+    await requestPermission().catch(() => null);
+    syncFrom(await api.listAssignments('open'));
+  }
 
   // Re-fetch whenever the screen regains focus (e.g. after creating one).
   useFocusEffect(
@@ -92,6 +114,20 @@ export default function HomeScreen() {
             </Pressable>
           ))}
         </ScrollView>
+      )}
+
+      {reminderNote === 'ask' && (
+        <View style={styles.prompt}>
+          <Text style={styles.promptText}>마감 하루 전에 알림을 받을까요?</Text>
+          <Pressable testID="reminder-ask" accessibilityRole="button" onPress={turnOnReminders} hitSlop={8}>
+            <Text style={styles.promptAction}>알림 켜기</Text>
+          </Pressable>
+        </View>
+      )}
+      {reminderNote === 'failed' && (
+        <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+          <Banner tone="info">알림을 예약하지 못했어요. 과제는 그대로 저장되어 있어요.</Banner>
+        </View>
       )}
 
       {!!error && (
@@ -176,6 +212,18 @@ const styles = StyleSheet.create({
   chipOn: { backgroundColor: colors.accent, borderColor: colors.accent },
   chipText: { fontSize: 13.5, color: colors.ink2, fontWeight: '600' },
   chipTextOn: { color: '#fff' },
+  prompt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 16,
+    marginBottom: 8,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: colors.accentSoft,
+  },
+  promptText: { color: colors.accent, fontSize: 14, flex: 1 },
+  promptAction: { color: colors.accent, fontSize: 14, fontWeight: '700' },
   list: { padding: 16, paddingTop: 8, gap: 10, paddingBottom: 100 },
   row: { backgroundColor: colors.surface, borderRadius: 14, padding: 14, gap: 6, borderWidth: 1, borderColor: colors.surface },
   rowOverdue: { borderColor: colors.danger },
