@@ -1,6 +1,6 @@
 # 사용성 테스트 · 인터뷰 결과 종합
 
-참가자별 기록표([observation-sheet.md](observation-sheet.md))를 모은 뒤 이 표를 채웁니다. 아직 진행 전이므로 칸이 비어 있습니다. 실제로 진행한 결과만 적습니다.
+참가자별 기록표([observation-sheet.md](observation-sheet.md), 간소화 버전은 [lite-guide.md](lite-guide.md))를 모은 뒤 이 표를 채웁니다. 간소화 버전은 B1–B4, H1, C4·C5 칸만 채웁니다. 아직 진행 전이므로 칸이 비어 있습니다. 실제로 진행한 결과만 적습니다.
 
 진행 기간: · 참가자 수: · 진행자/관찰자: · 앱 버전(develop 커밋):
 
