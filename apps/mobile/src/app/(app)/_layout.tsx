@@ -30,6 +30,10 @@ export default function AppLayout() {
   return (
     <Stack
       screenOptions={{
+        // SDK 58 makes the iOS 26+ header transparent (Liquid Glass) with content underneath.
+        // Our screens start with fixed content (tabs, banners), so keep the header opaque
+        // and the content below it, as on earlier iOS versions.
+        headerTransparent: false,
         headerTintColor: colors.accent,
         headerTitleStyle: { color: colors.ink },
         headerBackTitle: '뒤로',
