@@ -1,0 +1,119 @@
+# W10: deadline reminders (R07). Allows notifications if asked, then checks that
+# the phone's schedule follows submit, undo, delete and the on/off switch (T09, T11).
+# The new assignment's default deadline is tomorrow 23:59, so its reminder is today 23:59.
+appId: host.exp.Exponent
+env:
+  METRO_URL: exp://127.0.0.1:8081
+---
+- runFlow: common/fresh-account.yaml
+- runFlow:
+    file: common/create-assignment.yaml
+    env:
+      COURSE: "운영체제"
+      TITLE: "W10 알림 과제"
+- runFlow:
+    when:
+      visible: "마감 하루 전에 알림을 받을까요?"
+    commands:
+      - tapOn:
+          id: "reminder-ask"
+      - extendedWaitUntil:
+          visible: "Allow|허용"
+          timeout: 10000
+      - tapOn: "Allow|허용"
+- tapOn: "설정"
+- extendedWaitUntil:
+    visible: ".*예약된 알림 1개.*W10 알림 과제.*"
+    timeout: 15000
+- takeScreenshot: e2e/screenshots/43-reminder-scheduled
+
+# Submit → reminder cancelled; undo → scheduled again (T11)
+- tapOn: "뒤로"
+- extendedWaitUntil:
+    visible: "\\+ 과제 등록"
+    timeout: 15000
+- tapOn: ".*W10 알림 과제.*"
+- extendedWaitUntil:
+    visible: "제출 완료로 표시"
+    timeout: 15000
+- tapOn: "제출 완료로 표시"
+- extendedWaitUntil:
+    visible: "제출 완료 되돌리기"
+    timeout: 15000
+- tapOn: "뒤로"
+- extendedWaitUntil:
+    visible: "\\+ 과제 등록"
+    timeout: 15000
+- tapOn: "설정"
+- extendedWaitUntil:
+    visible: "예약된 알림이 없어요.*"
+    timeout: 15000
+- tapOn: "뒤로"
+- extendedWaitUntil:
+    visible: "\\+ 과제 등록"
+    timeout: 15000
+- tapOn: "제출 완료"
+- tapOn: ".*W10 알림 과제.*"
+- tapOn: "제출 완료 되돌리기"
+- extendedWaitUntil:
+    visible: "제출 완료로 표시"
+    timeout: 15000
+- tapOn: "뒤로"
+- extendedWaitUntil:
+    visible: "\\+ 과제 등록"
+    timeout: 15000
+- tapOn: "미제출 · 마감순"
+- tapOn: "설정"
+- extendedWaitUntil:
+    visible: ".*예약된 알림 1개.*"
+    timeout: 15000
+
+# Switch off → nothing scheduled; on → back again
+- tapOn:
+    id: "reminder-switch"
+- extendedWaitUntil:
+    notVisible:
+      id: "reminder-summary"
+    timeout: 10000
+- tapOn:
+    id: "reminder-switch"
+- extendedWaitUntil:
+    visible: ".*예약된 알림 1개.*"
+    timeout: 15000
+
+# Delete → reminder cancelled (T11)
+- tapOn: "뒤로"
+- extendedWaitUntil:
+    visible: "\\+ 과제 등록"
+    timeout: 15000
+- tapOn: ".*W10 알림 과제.*"
+- tapOn: "과제 삭제"
+- extendedWaitUntil:
+    visible: "과제를 삭제할까요?"
+    timeout: 5000
+- tapOn: "삭제"
+- extendedWaitUntil:
+    visible: "남은 과제가 없어요"
+    timeout: 15000
+- tapOn: "설정"
+- extendedWaitUntil:
+    visible: "예약된 알림이 없어요.*"
+    timeout: 15000
+- takeScreenshot: e2e/screenshots/44-reminder-none
+
+# Test reminder last: its banner covers the top bar for a few seconds.
+- tapOn: "테스트 알림 보내기 (5초 뒤)"
+- assertVisible: "5초 뒤에 알림이 와요.*"
+- extendedWaitUntil:
+    visible: "마감한칸 알림 테스트"
+    timeout: 12000
+    optional: true
+- takeScreenshot: e2e/screenshots/45-test-notification
+- extendedWaitUntil:
+    visible: "__wait_for_banner_to_leave__"
+    timeout: 7000
+    optional: true
+- tapOn: "로그아웃"
+- extendedWaitUntil:
+    visible: "가입하고 시작하기|로그인"
+    timeout: 15000

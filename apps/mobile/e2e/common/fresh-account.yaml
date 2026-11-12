@@ -5,8 +5,23 @@ appId: host.exp.Exponent
 - stopApp
 - openLink: ${METRO_URL}
 - extendedWaitUntil:
-    visible: "로그인|설정"
+    visible: "로그인|설정|Continue"
     timeout: 60000
+# A freshly installed Expo Go shows its developer-menu intro once.
+- tapOn:
+    text: "Continue"
+    optional: true
+# ...after which the developer menu stays open; swipe it away.
+- runFlow:
+    when:
+      visible: "Reload"
+    commands:
+      - swipe:
+          start: "50%,50%"
+          end: "50%,98%"
+- extendedWaitUntil:
+    visible: "로그인|설정"
+    timeout: 15000
 - runFlow:
     when:
       visible: "설정"
