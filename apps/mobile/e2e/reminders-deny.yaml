@@ -1,0 +1,47 @@
+# W10 / T09 (deny): refusing notifications shows guidance and the app keeps working.
+# Needs Expo Go with notification permission not yet asked (reinstall it first):
+#   xcrun simctl uninstall booted host.exp.Exponent
+#   xcrun simctl install booted ~/.expo/ios-simulator-app-cache/Expo-Go-58.0.7.tar.app
+appId: host.exp.Exponent
+env:
+  METRO_URL: exp://127.0.0.1:8081
+---
+- runFlow: common/fresh-account.yaml
+- runFlow:
+    file: common/create-assignment.yaml
+    env:
+      COURSE: "운영체제"
+      TITLE: "W10 알림 거부 과제"
+- extendedWaitUntil:
+    visible: "마감 하루 전에 알림을 받을까요?"
+    timeout: 15000
+- takeScreenshot: e2e/screenshots/41-reminder-ask
+- tapOn:
+    id: "reminder-ask"
+- extendedWaitUntil:
+    visible: "Don.t Allow|허용 안 함"
+    timeout: 10000
+- tapOn: "Don.t Allow|허용 안 함"
+- extendedWaitUntil:
+    notVisible: "마감 하루 전에 알림을 받을까요?"
+    timeout: 10000
+- tapOn: "설정"
+- extendedWaitUntil:
+    visible: "알림이 꺼져 있어요.*"
+    timeout: 15000
+- assertVisible: "휴대폰 설정 열기"
+- takeScreenshot: e2e/screenshots/42-reminder-denied
+- tapOn: "뒤로"
+# Everything else still works without notifications
+- runFlow:
+    file: common/create-assignment.yaml
+    env:
+      COURSE: "운영체제"
+      TITLE: "W10 거부 후 등록"
+- assertVisible: ".*W10 알림 거부 과제.*"
+- assertNotVisible: "마감 하루 전에 알림을 받을까요?"
+- tapOn: "설정"
+- tapOn: "로그아웃"
+- extendedWaitUntil:
+    visible: "가입하고 시작하기|로그인"
+    timeout: 15000
